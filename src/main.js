@@ -1,11 +1,11 @@
-import { viewMenu } from "./view/view-menu.js";
-import { filters } from "./view/filters.js";
-import { tripInfo } from "./view/trip-info.js";
-import { tripPrice } from "./view/trip-price.js";
-import { tripSort } from "./view/trip-sort.js";
-import { tripItemsList } from "./view/trip-items-list.js";
-import { tripItem } from "./view/trip-item.js";
-import { tripItemEdition } from "./view/trip-item-edition.js";
+import { viewMenu } from './view/view-menu.js';
+import { filters } from './view/filters.js';
+import { tripInfo } from './view/trip-info.js';
+import { tripPrice } from './view/trip-price.js';
+import { tripSort } from './view/trip-sort.js';
+import { tripItemsList } from './view/trip-items-list.js';
+import { tripItem } from './view/trip-item.js';
+import { tripItemEdition } from './view/trip-item-edition.js';
 
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
@@ -37,6 +37,6 @@ const TRIP_ITEMS_ON_PAGE = 3;
 
 for (let i = 0; i < TRIP_ITEMS_ON_PAGE; i++) {
   render(tripItemsListElement, tripItem(), 'beforeend');
-};
+}
 
 render(tripItemsListElement, tripItemEdition(), 'afterbegin');
