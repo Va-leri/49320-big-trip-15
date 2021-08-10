@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { humanizeDate } from '../utils';
 
 const createTripRouteTemplate = (tripPointsArr) =>
   tripPointsArr.length > 3 ?
@@ -6,7 +6,7 @@ const createTripRouteTemplate = (tripPointsArr) =>
     `${tripPointsArr.map(({ destination }) => destination.name).join(' &mdash; ')}`;
 
 const createTripDatesTemplate = (tripPointsArr) =>
-  `${dayjs(tripPointsArr[0].dates.from).format('MMM DD')} &mdash; ${dayjs(tripPointsArr[tripPointsArr.length - 1].dates.to).format('MMM DD')}`;
+  `${humanizeDate(tripPointsArr[0].dateFrom, 'MMM DD')} &mdash; ${humanizeDate(tripPointsArr[tripPointsArr.length - 1].dateTo, 'MMM DD')}`;
 
 export const tripInfo = (tripPoints) => {
   const tripRouteTemplate = createTripRouteTemplate(tripPoints);

@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { humanizeDate } from '../utils';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -9,10 +9,10 @@ const createTripTypesTemplate = (tripTypes) => tripTypes.map((type) => `<div cla
 
 const createDestinationsTemplate = (destinationsArr) => destinationsArr.map((destination) => `<option value="${destination}"></option>`).join('');
 
-const createOffersTemplate = (availabelOffers, activeOfffers) => {
+const createOffersTemplate = (availabelOffers, activeOffers) => {
   const offersList = availabelOffers.map(({ title, price }) => {
-    const isActive = activeOfffers ?
-      Boolean(activeOfffers.find((item) => item.title === title && item.price === price))
+    const isActive = activeOffers ?
+      Boolean(activeOffers.find((item) => item.title === title))
       : false;
     return `<div class="event__offer-selector">
             <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${isActive ? 'checked' : ''}>
@@ -44,7 +44,7 @@ const crateDestinationDescriptionTemplate = ({ description, pictures }) => (`<se
     </div>
   </section>`);
 
-export const tripItemEdition = ({ type, dates, basePrice, destination, offers }, offersByType, TYPES, CITIES) => {
+export const tripItemEdition = ({ type, dateFrom, dateTo, basePrice, destination, offers }, offersByType, TYPES, CITIES) => {
 
   const availabelOffers = offersByType.find((item) => item.type === type).offers;
   const offersTemplate = createOffersTemplate(availabelOffers, offers);
@@ -83,10 +83,10 @@ export const tripItemEdition = ({ type, dates, basePrice, destination, offers },
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dayjs(dates.from).format('DD/MM/YY HH:mm')}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(dateFrom, 'DD/MM/YY HH:mm')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dayjs(dates.to).format('DD/MM/YY HH:mm')}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(dateTo, 'DD/MM/YY HH:mm')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">

@@ -1,22 +1,12 @@
 import dayjs from 'dayjs';
 
-// Функция из интернета по генерации случайного числа из диапазона
-// Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
+import { getRandomInteger } from '../utils';
 
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
-
-const CITIES = ['Amsterdam', 'Chamonix', 'Moscow', 'Tokyo', 'New York', 'Bugulma'];
+import { CITIES, TYPES } from '../const';
 
 const RANDOM_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
 
 const sentencesArr = RANDOM_TEXT.split('. ');
-
 
 const generateRandomItem = (itemsArr) => {
   const randomIndex = getRandomInteger(0, itemsArr.length - 1);
@@ -34,12 +24,17 @@ const generateDescription = () => {
   return `${descriptionArr.join('. ')}.`;
 };
 
+let previousPointEndDate = new Date();
 const generateDates = () => {
-  const startDayGap = getRandomInteger(0, 365) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
-  const endDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
+  const startDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
+  const endDayGap = getRandomInteger(0, 10) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
+  // debugger;
+  const dateFrom = dayjs(previousPointEndDate).add(startDayGap, 'minute').toDate();
+  const dateTo = dayjs(dateFrom).add(endDayGap, 'minute').toDate();
+  previousPointEndDate = dateTo;
   return {
-    from: dayjs().add(startDayGap, 'minute').toDate(),
-    to: dayjs().add(startDayGap + endDayGap, 'minute').toDate(),
+    from: dateFrom,
+    to: dateTo,
   };
 };
 
@@ -60,17 +55,20 @@ const generateDestination = () => ({
   pictures: generatePictures(),
 });
 
-const offersTitles = ['Choose meal', 'Choose seat', 'Upgrade to comfort', 'Add luggage', 'Add massage'];
+const offersTitles = ['Choose meal', 'Choose seat', 'Upgrade to comfort', 'Add luggage', 'Add massage', 'Unlimited alcohol', 'WiFi'];
 
 const generateOffers = () => {
-  const generateOffer = () => ({
-    title: generateRandomItem(offersTitles),
+  const generateOffer = (offerName) => ({
+    title: offerName,
     price: getRandomInteger(0, 1000),
   });
 
   const getOffersArr = () => {
-    const getOffersCount = getRandomInteger(2, offersTitles.length);
-    return new Array(getOffersCount).fill().map(generateOffer);
+    const offersCount = getRandomInteger(2, 5);
+    const startIndex = getRandomInteger(0, offersTitles.length - offersCount);
+    const endIndex = startIndex + offersCount;
+
+    return offersTitles.slice(startIndex, endIndex).map((item) => generateOffer(item));
   };
 
   return TYPES.map((type) => ({
@@ -80,28 +78,35 @@ const generateOffers = () => {
 };
 
 const offersByType = generateOffers();
+// console.log(offersByType);
 
 const generateItemOffers = (currentType) => {
   const availabelOffers = offersByType.find(({ type }) => type === currentType).offers;
-  const offersNumber = getRandomInteger(1, availabelOffers.length);
-  const offers = new Array(offersNumber).fill().map(() => generateRandomItem(availabelOffers));
+  const offersCount = getRandomInteger(1, availabelOffers.length);
+  const startIndex = getRandomInteger(0, availabelOffers.length - offersCount);
+  const endIndex = startIndex + offersCount;
+  // const offers = new Array(offersNumber).fill().map(() => generateRandomItem(availabelOffers));
+  const offers = availabelOffers.slice(startIndex, endIndex);
   return offers;
 };
 
-const generateTripItem = () => {
+const generateTripItem = (index = 0) => {
   // const isDestination = Boolean(getRandomInteger(0, 1));
   const isDestination = true;
   const areOffers = Boolean(getRandomInteger(0, 1));
   const type = generateRandomItem(TYPES);
+  const dates = generateDates();
 
   return {
     type,
-    dates: generateDates(),
+    dateFrom: dates.from,
+    dateTo: dates.to,
+    id: index,
     basePrice: getRandomInteger(0, 5000),
-    offers: areOffers ? generateItemOffers(type) : null,
+    offers: areOffers ? generateItemOffers(type) : [],
     destination: isDestination ? generateDestination() : undefined,
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };
 
-export { generateTripItem, offersByType, TYPES, CITIES };
+export { generateTripItem, offersByType };

@@ -1,7 +1,7 @@
-import dayjs from 'dayjs';
+import { humanizeDate, getPointDuration } from '../utils';
 
 const createOffersTemplate = (offers) =>
-  !offers ? '' :
+  !offers.length ? '' :
     `<h4 class="visually-hidden">Offers:</h4>
       <ul class="event__selected-offers">
     ${offers.map(({ title, price }) =>
@@ -12,52 +12,24 @@ const createOffersTemplate = (offers) =>
   </li>`)).join('')}
     </ul>`;
 
-const getPointDuration = ({ from, to }) => {
-  const durationInDays = dayjs(to).diff(dayjs(from), 'd');
-  const durationInHours = dayjs(to).diff(dayjs(from), 'h');
-  const durationInMinutes = dayjs(to).diff(dayjs(from), 'm');
-
-  const duration = {
-    D: durationInDays,
-    get H() {
-      return durationInHours - this.D * 24;
-    },
-    get M() {
-      return durationInMinutes - this.D * 24 * 60 - this.H * 60;
-    },
-  };
-
-  const formatedDuration = Object.entries(duration).map(([units, value]) => {
-    if (value) {
-      if (value < 10) {
-        value = `0${value}`;
-      }
-      return `${value}${units} `;
-    }
-  }).join('');
-
-  return formatedDuration;
-};
-
-
-export const tripItem = ({ type, dates, basePrice, destination, offers, isFavorite }) => {
+export const tripItem = ({ type, dateFrom, dateTo, basePrice, destination, offers, isFavorite }) => {
   const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
   const offersTemplate = createOffersTemplate(offers);
 
-  const pointDuration = getPointDuration(dates);
+  const pointDuration = getPointDuration(dateFrom, dateTo);
 
   return `<li class="trip-events__item">
     <div class="event">
-      <time class="event__date" datetime="2019-03-18">${dayjs(dates.to).format('MMM DD')}</time>
+      <time class="event__date" datetime="${dateFrom}">${humanizeDate(dateFrom, 'MMM DD')}</time>
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
       <h3 class="event__title">${type} ${destination ? destination.name : ''}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="${dates.from}">${dayjs(dates.from).format('HH:mm')}</time>
+          <time class="event__start-time" datetime="${dateFrom}">${humanizeDate(dateFrom, 'HH:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="${dates.to}">${dayjs(dates.to).format('HH:mm')}</time>
+          <time class="event__end-time" datetime="${dateTo}">${humanizeDate(dateTo, 'HH:mm')}</time>
         </p>
         <p class="event__duration">${pointDuration}</p>
       </div>

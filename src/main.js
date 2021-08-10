@@ -6,11 +6,12 @@ import { tripSort } from './view/trip-sort.js';
 import { tripItemsList } from './view/trip-items-list.js';
 import { tripItem } from './view/trip-item.js';
 import { tripItemEdition } from './view/trip-item-edition.js';
-import { generateTripItem, offersByType, TYPES, CITIES } from './model/trip-item-mock.js';
+import { generateTripItem, offersByType } from './model/trip-item-mock.js';
+import { CITIES, TYPES } from './const.js';
 
 const TRIP_POINTS_COUNT = 15;
 
-const tripPoints = new Array(TRIP_POINTS_COUNT).fill().map(generateTripItem);
+const tripPoints = new Array(TRIP_POINTS_COUNT).fill().map((id) => generateTripItem(id));
 
 // console.log(tripPoints);
 
@@ -51,9 +52,3 @@ const fillTripItemsList = ([firstPoint, ...points]) => {
 };
 
 fillTripItemsList(tripPoints);
-
-// for (let i = 0; i < TRIP_POINTS_COUNT; i++) {
-//   render(tripItemsListElement, tripItem(tripPoints[i]), 'beforeend');
-// }
-
-// render(tripItemsListElement, tripItemEdition(tripPoints[0], offersByType, TYPES, CITIES), 'afterbegin');
