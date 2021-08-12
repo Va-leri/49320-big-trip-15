@@ -24,11 +24,9 @@ const generateDescription = () => {
   return `${descriptionArr.join('. ')}.`;
 };
 
-// let previousPointEndDate = new Date();
 const generateDates = (previousPointEndDate) => {
   const startDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
   const endDayGap = getRandomInteger(0, 10) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
-  // debugger;
   const dateFrom = dayjs(previousPointEndDate).add(startDayGap, 'minute').toDate();
   const dateTo = dayjs(dateFrom).add(endDayGap, 'minute').toDate();
   previousPointEndDate = dateTo;
@@ -85,7 +83,6 @@ const generateItemOffers = (currentType) => {
   const offersCount = getRandomInteger(1, availabelOffers.length);
   const startIndex = getRandomInteger(0, availabelOffers.length - offersCount);
   const endIndex = startIndex + offersCount;
-  // const offers = new Array(offersNumber).fill().map(() => generateRandomItem(availabelOffers));
   const offers = availabelOffers.slice(startIndex, endIndex);
   return offers;
 };
@@ -122,7 +119,5 @@ const generateTripItems = (tripItemsCount) => {
 };
 
 const tripItems = generateTripItems(TRIP_ITEMS_COUNT);
-
-// const tripPoints = new Array(TRIP_POINTS_COUNT).fill().map((id) => generateTripItem(id));
 
 export { tripItems, offersByType };
