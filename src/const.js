@@ -14,3 +14,8 @@ export const BLANC_POINT = {
   destination: undefined,
   isFavorite: false,
 };
+
+export const KeyCode = {
+  ESC: 27,
+  ENTER: 13,
+};
