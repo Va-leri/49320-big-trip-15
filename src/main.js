@@ -1,23 +1,14 @@
-import { viewMenu } from './view/view-menu.js';
-import { filters } from './view/filters.js';
-import { tripInfo } from './view/trip-info.js';
-import { tripPrice } from './view/trip-price.js';
-import { tripSort } from './view/trip-sort.js';
-import { tripItemsList } from './view/trip-items-list.js';
-import { tripItem } from './view/trip-item.js';
-import { tripItemEdition } from './view/trip-item-edition.js';
-import { generateTripItem, offersByType } from './model/trip-item-mock.js';
+import ViewMenuView from './view/view-menu.js';
+import FiltersView from './view/filters.js';
+import TripInfoView from './view/trip-info.js';
+import TripPriceView from './view/trip-price.js';
+import TripSortView from './view/trip-sort.js';
+import TripItemsListView from './view/trip-items-list.js';
+import TripItemView from './view/trip-item.js';
+import TripItemEditionView from './view/trip-item-edition.js';
+import { tripItems, offersByType } from './model/trip-item-mock.js';
 import { CITIES, TYPES } from './const.js';
-
-const TRIP_POINTS_COUNT = 15;
-
-const tripPoints = new Array(TRIP_POINTS_COUNT).fill().map((id) => generateTripItem(id));
-
-// console.log(tripPoints);
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
+import { render, RenderPosition } from './utils.js';
 
 const siteMainElement = document.querySelector('.page-main');
 const siteHeaderElement = document.querySelector('.page-header');
@@ -26,29 +17,52 @@ const tripMainElement = siteHeaderElement.querySelector('.trip-main');
 const tripControlsNavigationElement = tripMainElement.querySelector('.trip-controls__navigation');
 const tripControlsFiltersElement = tripMainElement.querySelector('.trip-controls__filters');
 
-render(tripMainElement, tripInfo(tripPoints), 'afterbegin');
+const tripInfoComponent = new TripInfoView(tripItems);
 
-const tripInfoElement = tripMainElement.querySelector('.trip-info');
+render(tripMainElement, tripInfoComponent.getElement(), RenderPosition.AFTERBEGIN);
 
-render(tripInfoElement, tripPrice(tripPoints), 'beforeend');
+render(tripInfoComponent.getElement(), new TripPriceView(tripItems).getElement(), RenderPosition.BEFOREEND);
 
-render(tripControlsNavigationElement, viewMenu(), 'beforeend');
-render(tripControlsFiltersElement, filters(), 'beforeend');
+render(tripControlsNavigationElement, new ViewMenuView().getElement(), RenderPosition.BEFOREEND);
+render(tripControlsFiltersElement, new FiltersView().getElement(), RenderPosition.BEFOREEND);
 
 const tripEventsElement = siteMainElement.querySelector('.trip-events');
 
-render(tripEventsElement, tripSort(), 'beforeend');
-render(tripEventsElement, tripItemsList(), 'beforeend');
+render(tripEventsElement, new TripSortView().getElement(), RenderPosition.BEFOREEND);
 
-const tripItemsListElement = tripEventsElement.querySelector('.trip-events__list');
-// const TRIP_ITEMS_ON_PAGE = 15;
+const tripItemsListComponent = new TripItemsListView();
+render(tripEventsElement, tripItemsListComponent.getElement(), RenderPosition.BEFOREEND);
 
+const renderTripItem = (item) => {
+  const tripItemComponent = new TripItemView(item);
+  const tripItemEditionComponent = new TripItemEditionView(item, offersByType, TYPES, CITIES);
 
-const fillTripItemsList = ([firstPoint, ...points]) => {
-  render(tripItemsListElement, tripItemEdition(firstPoint, offersByType, TYPES, CITIES), 'afterbegin');
-  points.forEach((point) => {
-    render(tripItemsListElement, tripItem(point), 'beforeend');
+  const tripItemRoollupBtn = tripItemComponent.getElement().querySelector('.event__rollup-btn');
+  const tripItemEditionForm = tripItemEditionComponent.getElement().querySelector('form');
+
+  const replaceItemToForm = () => {
+    tripItemsListComponent.getElement().replaceChild(tripItemEditionComponent.getElement(), tripItemComponent.getElement());
+  };
+  const replaceFormToItem = () => {
+    tripItemsListComponent.getElement().replaceChild(tripItemComponent.getElement(), tripItemEditionComponent.getElement());
+  };
+
+  render(tripItemsListComponent.getElement(), tripItemComponent.getElement(), RenderPosition.BEFOREEND);
+
+  tripItemRoollupBtn.addEventListener('click', () => {
+    replaceItemToForm();
+  });
+
+  tripItemEditionForm.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    replaceFormToItem();
   });
 };
 
-fillTripItemsList(tripPoints);
+const fillTripItemsList = (items) => {
+  items.forEach((item) => {
+    renderTripItem(item);
+  });
+};
+
+fillTripItemsList(tripItems);

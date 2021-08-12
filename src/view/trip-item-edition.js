@@ -1,4 +1,6 @@
 import { humanizeDate } from '../utils';
+import { createElement } from '../utils';
+import { BLANC_POINT } from '../const';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -44,13 +46,13 @@ const crateDestinationDescriptionTemplate = ({ description, pictures }) => (`<se
     </div>
   </section>`);
 
-export const tripItemEdition = ({ type, dateFrom, dateTo, basePrice, destination, offers }, offersByType, TYPES, CITIES) => {
+const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, destination, offers }, offersByType, tripTypes, destinations) => {
 
   const availabelOffers = offersByType.find((item) => item.type === type).offers;
   const offersTemplate = createOffersTemplate(availabelOffers, offers);
 
-  const tripTypesTemplate = createTripTypesTemplate(TYPES);
-  const destinationsTemplate = createDestinationsTemplate(CITIES);
+  const tripTypesTemplate = createTripTypesTemplate(tripTypes);
+  const destinationsTemplate = createDestinationsTemplate(destinations);
   const destinationDescriptionTemplate = destination ? crateDestinationDescriptionTemplate(destination) : '';
 
   return `<li class="trip-events__item">
@@ -109,3 +111,30 @@ export const tripItemEdition = ({ type, dateFrom, dateTo, basePrice, destination
     </form>
   </li>`;
 };
+
+export default class TripItemEdition {
+  constructor(tripPoint, offersByType, tripTypes, destinations) {
+    this._element = null;
+    this._pointData = tripPoint || BLANC_POINT;
+    this._offers = offersByType;
+    this._tripTypes = tripTypes;
+    this._destinations = destinations;
+  }
+
+
+  getTemplate() {
+    return createTripItemEditionTemplate(this._pointData, this._offers, this._tripTypes, this._destinations);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

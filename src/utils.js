@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
+
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 export const getRandomInteger = (a = 0, b = 1) => {
@@ -10,6 +15,24 @@ export const getRandomInteger = (a = 0, b = 1) => {
 };
 
 export const humanizeDate = (date, formatString) => dayjs(date).format(formatString);
+
+export const render = (container, element, position) => {
+  switch (position) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (temlate) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = temlate;
+
+  return newElement.firstChild;
+};
 
 export const getPointDuration = (from, to) => {
   const durationInDays = dayjs(to).diff(dayjs(from), 'd');

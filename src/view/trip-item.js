@@ -1,4 +1,5 @@
 import { humanizeDate, getPointDuration } from '../utils';
+import { createElement } from '../utils';
 
 const createOffersTemplate = (offers) =>
   !offers.length ? '' :
@@ -12,7 +13,7 @@ const createOffersTemplate = (offers) =>
   </li>`)).join('')}
     </ul>`;
 
-export const tripItem = ({ type, dateFrom, dateTo, basePrice, destination, offers, isFavorite }) => {
+const createTripItemTemplate = ({ type, dateFrom, dateTo, basePrice, destination, offers, isFavorite }) => {
   const favoriteClass = isFavorite ? 'event__favorite-btn--active' : '';
   const offersTemplate = createOffersTemplate(offers);
 
@@ -49,3 +50,26 @@ export const tripItem = ({ type, dateFrom, dateTo, basePrice, destination, offer
     </div>
   </li>`;
 };
+
+export default class TripItem {
+  constructor(tripPoint) {
+    this._element = null;
+    this._data = tripPoint;
+  }
+
+  getTemplate() {
+    return createTripItemTemplate(this._data);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

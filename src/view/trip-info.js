@@ -1,4 +1,5 @@
 import { humanizeDate } from '../utils';
+import { createElement } from '../utils';
 
 const createTripRouteTemplate = (tripPointsArr) =>
   tripPointsArr.length > 3 ?
@@ -8,7 +9,7 @@ const createTripRouteTemplate = (tripPointsArr) =>
 const createTripDatesTemplate = (tripPointsArr) =>
   `${humanizeDate(tripPointsArr[0].dateFrom, 'MMM DD')} &mdash; ${humanizeDate(tripPointsArr[tripPointsArr.length - 1].dateTo, 'MMM DD')}`;
 
-export const tripInfo = (tripPoints) => {
+const createTripInfoTemplate = (tripPoints) => {
   const tripRouteTemplate = createTripRouteTemplate(tripPoints);
 
   const tripDatesTemplate = createTripDatesTemplate(tripPoints);
@@ -21,3 +22,26 @@ export const tripInfo = (tripPoints) => {
     </div>
   </section>`;
 };
+
+export default class TripInfo {
+  constructor(tripPoints) {
+    this._element = null;
+    this._tripPoints = tripPoints;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._tripPoints);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
