@@ -23,7 +23,7 @@ const createTripInfoTemplate = (tripPoints) => {
   </section>`;
 };
 
-export default class tripInfo {
+export default class TripInfo {
   constructor(tripPoints) {
     this._element = null;
     this._tripPoints = tripPoints;

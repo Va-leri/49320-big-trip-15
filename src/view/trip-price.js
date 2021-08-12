@@ -8,7 +8,7 @@ const createTripPriceTemplate = (tripPoints) => {
   </p>`;
 };
 
-export default class tripPrice {
+export default class TripPrice {
   constructor(tripPoints) {
     this._element = null;
     this._tripPoints = tripPoints;

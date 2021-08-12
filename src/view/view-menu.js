@@ -7,7 +7,7 @@ const createViewMenuTemplate = () => (
   </nav>`
 );
 
-export default class viewMenu {
+export default class ViewMenu {
   costructor() {
     this._element = null;
   }

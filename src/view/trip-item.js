@@ -51,7 +51,7 @@ const createTripItemTemplate = ({ type, dateFrom, dateTo, basePrice, destination
   </li>`;
 };
 
-export default class tripItem {
+export default class TripItem {
   constructor(tripPoint) {
     this._element = null;
     this._data = tripPoint;

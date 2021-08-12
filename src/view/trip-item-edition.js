@@ -1,6 +1,7 @@
-import { TYPES } from '../const';
+// import { TYPES } from '../const';
 import { humanizeDate } from '../utils';
 import { createElement } from '../utils';
+import BlancPoint from '../model/blanc-point';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -112,21 +113,10 @@ const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, dest
   </li>`;
 };
 
-const BLANK_POINT = {
-  type: TYPES[0],
-  dateFrom: undefined,
-  dateTo: undefined,
-  id: undefined,
-  basePrice: undefined,
-  offers: [],
-  destination: undefined,
-  isFavorite: false,
-};
-
-export default class tripItemEdition {
-  constructor(tripPoint = BLANK_POINT, offersByType, tripTypes, destinations) {
+export default class TripItemEdition {
+  constructor(tripPoint, offersByType, tripTypes, destinations) {
     this._element = null;
-    this._pointData = tripPoint;
+    this._pointData = tripPoint || new BlancPoint().pointData;
     this._offers = offersByType;
     this._tripTypes = tripTypes;
     this._destinations = destinations;

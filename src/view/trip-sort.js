@@ -29,7 +29,7 @@ const createTripSortTemplate = () => (
   </form>`
 );
 
-export default class tripSort {
+export default class TripSort {
   constructor() {
     this._element = null;
   }

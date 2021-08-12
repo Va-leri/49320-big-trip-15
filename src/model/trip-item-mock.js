@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 import { getRandomInteger } from '../utils';
 
-import { CITIES, TYPES } from '../const';
+import { CITIES, TYPES, TRIP_ITEMS_COUNT } from '../const';
 
 const RANDOM_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus';
 
@@ -24,8 +24,8 @@ const generateDescription = () => {
   return `${descriptionArr.join('. ')}.`;
 };
 
-let previousPointEndDate = new Date();
-const generateDates = () => {
+// let previousPointEndDate = new Date();
+const generateDates = (previousPointEndDate) => {
   const startDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
   const endDayGap = getRandomInteger(0, 10) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
   // debugger;
@@ -90,12 +90,12 @@ const generateItemOffers = (currentType) => {
   return offers;
 };
 
-const generateTripItem = (index = 0) => {
+const generateTripItem = (index = 0, previousPointEndDate) => {
   // const isDestination = Boolean(getRandomInteger(0, 1));
   const isDestination = true;
   const areOffers = Boolean(getRandomInteger(0, 1));
   const type = generateRandomItem(TYPES);
-  const dates = generateDates();
+  const dates = generateDates(previousPointEndDate);
 
   return {
     type,
@@ -109,4 +109,20 @@ const generateTripItem = (index = 0) => {
   };
 };
 
-export { generateTripItem, offersByType };
+const generateTripItems = (tripItemsCount) => {
+  const items = [];
+  let previousPointEndDate = new Date();
+  for (let i = 0; i < tripItemsCount; i++) {
+    const item = generateTripItem(i, previousPointEndDate);
+    previousPointEndDate = item.dateTo;
+    items.push(item);
+  }
+
+  return items;
+};
+
+const tripItems = generateTripItems(TRIP_ITEMS_COUNT);
+
+// const tripPoints = new Array(TRIP_POINTS_COUNT).fill().map((id) => generateTripItem(id));
+
+export { tripItems, offersByType };
