@@ -1,6 +1,6 @@
-import { humanizeDate } from '../utils';
-import { createElement } from '../utils';
-import { BLANC_POINT } from '../const';
+import { humanizeDate } from '../utils/common.js';
+import { BLANC_POINT } from '../const.js';
+import AbstractView from './abstract.js';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -115,13 +115,16 @@ const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, dest
   </li>`;
 };
 
-export default class TripItemEdition {
+export default class TripItemEdition extends AbstractView {
   constructor(tripPoint, offersByType, tripTypes, destinations) {
-    this._element = null;
+    super();
     this._pointData = tripPoint || BLANC_POINT;
     this._offers = offersByType;
     this._tripTypes = tripTypes;
     this._destinations = destinations;
+
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
   }
 
 
@@ -129,15 +132,23 @@ export default class TripItemEdition {
     return createTripItemEditionTemplate(this._pointData, this._offers, this._tripTypes, this._destinations);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _formSubmitHandler(evt) {
+    evt.preventDefault();
+    this._callback.formSubmit();
   }
 
-  removeElement() {
-    this._element = null;
+  setFormSubmitHadler(callback) {
+    const tripItemEditionForm = this.getElement().querySelector('form');
+    tripItemEditionForm.addEventListener('submit', this._formSubmitHandler);
+    this._callback.formSubmit = callback;
+  }
+
+  _rollupBtnClickHandler() {
+    this._callback.rollupBtnClick();
+  }
+
+  setRollupBtnClickHandler(callback) {
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupBtnClickHandler);
+    this._callback.rollupBtnClick = callback;
   }
 }

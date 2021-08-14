@@ -19,3 +19,8 @@ export const KeyCode = {
   ESC: 27,
   ENTER: 13,
 };
+
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
