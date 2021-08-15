@@ -1,5 +1,6 @@
-import { humanizeDate, getPointDuration } from '../utils';
-import { createElement } from '../utils';
+import { humanizeDate } from '../utils/common.js';
+import { getPointDuration } from '../utils/trip.js';
+import AbstractView from './abstract.js';
 
 const createOffersTemplate = (offers) =>
   !offers.length ? '' :
@@ -51,25 +52,24 @@ const createTripItemTemplate = ({ type, dateFrom, dateTo, basePrice, destination
   </li>`;
 };
 
-export default class TripItem {
+export default class TripItem extends AbstractView {
   constructor(tripPoint) {
-    this._element = null;
+    super();
     this._data = tripPoint;
+
+    this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
   }
 
   getTemplate() {
     return createTripItemTemplate(this._data);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _rollupBtnClickHandler() {
+    this._callback.rollupBtnClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setRollupBtnClickHandler(callback) {
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupBtnClickHandler);
+    this._callback.rollupBtnClick = callback;
   }
 }
