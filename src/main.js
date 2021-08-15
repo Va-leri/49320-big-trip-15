@@ -7,7 +7,7 @@ import TripItemsListView from './view/trip-items-list.js';
 import TripItemView from './view/trip-item.js';
 import TripItemEditionView from './view/trip-item-edition.js';
 import NoPointsView from './view/no-points.js';
-import TripEventsView from './view/tripEvents.js';
+import TripEventsView from './view/trip-events.js';
 import { tripItems, offersByType } from './model/trip-item-mock.js';
 import { CITIES, TYPES, KeyCode, RenderPosition } from './const.js';
 import { render, replace } from './utils/render.js';
