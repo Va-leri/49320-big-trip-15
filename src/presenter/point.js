@@ -23,7 +23,6 @@ export default class Point {
     this._tripItemRollupBtnClickHandler = this._tripItemRollupBtnClickHandler.bind(this);
     this._formSubmitHadler = this._formSubmitHadler.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
-    // this._favoriteClickHandler = this._handleFavoriteClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
@@ -60,12 +59,10 @@ export default class Point {
 
   _tripItemFormRollupBtnClickHandler() {
     this._replaceFormToItem();
-    document.removeEventListener('keydown', this._escKeydownHandler);
   }
 
   _formSubmitHadler() {
     this._replaceFormToItem();
-    document.removeEventListener('keydown', this._escKeydownHandler);
   }
 
   _handleFavoriteClick() {
@@ -99,12 +96,12 @@ export default class Point {
       return;
     }
 
-    if (this._itemsList.getElement().contains(prevItemComponent.getElement())) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._tripItemComponent, prevItemComponent);
       return;
     }
 
-    if (this._itemsList.getElement().contains(prevItemEditionComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._tripItemEditionComponent, prevItemEditionComponent);
     }
   }
