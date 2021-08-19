@@ -76,7 +76,6 @@ const generateOffers = () => {
 };
 
 const offersByType = generateOffers();
-// console.log(offersByType);
 
 const generateItemOffers = (currentType) => {
   const availabelOffers = offersByType.find(({ type }) => type === currentType).offers;
