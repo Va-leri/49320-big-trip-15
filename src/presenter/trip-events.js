@@ -78,14 +78,17 @@ export default class TripEvents {
     this._currentSortType = sortType;
   }
 
+  _clearTripItemsList() {
+    this._pointPresenter.forEach((presenter) => presenter.destroy());
+    this._pointPresenter.clear();
+  }
+
   _handleTripSort(sortType) {
     if (this._currentSortType === sortType) {
       return;
     }
     this._sortItems(sortType);
-    this._pointPresenter.forEach((presenter) => presenter.destroy());
-    this._pointPresenter.clear();
-
+    this._clearTripItemsList();
     this._fillTripItemsList();
   }
 
