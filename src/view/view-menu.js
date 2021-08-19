@@ -8,10 +8,6 @@ const createViewMenuTemplate = () => (
 );
 
 export default class ViewMenu extends AbstractView {
-  constructor() {
-    super();
-  }
-
   getTemplate() {
     return createViewMenuTemplate();
   }
