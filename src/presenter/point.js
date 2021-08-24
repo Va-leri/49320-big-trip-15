@@ -1,7 +1,7 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { offersByType } from '../model/trip-item-mock.js';
-import { CITIES, TYPES, KeyCode, RenderPosition } from '../const.js';
+import { offersByType, destinations } from '../model/trip-item-mock.js';
+import { TYPES, KeyCode, RenderPosition } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 
 const Mode = {
@@ -38,7 +38,6 @@ export default class Point {
     document.removeEventListener('keydown', this._escKeydownHandler);
   }
 
-
   _replaceItemToForm() {
     replace(this._tripItemEditionComponent, this._tripItemComponent);
     document.addEventListener('keydown', this._escKeydownHandler);
@@ -49,6 +48,7 @@ export default class Point {
   _escKeydownHandler(evt) {
     if (evt.keyCode === KeyCode.ESC) {
       evt.preventDefault();
+      this._tripItemEditionComponent.resetState(this._item);
       this._replaceFormToItem();
     }
   }
@@ -58,10 +58,12 @@ export default class Point {
   }
 
   _tripItemFormRollupBtnClickHandler() {
+    this._tripItemEditionComponent.resetState(this._item);
     this._replaceFormToItem();
   }
 
-  _formSubmitHadler() {
+  _formSubmitHadler(data) {
+    this._handleTripItemChange(data);
     this._replaceFormToItem();
   }
 
@@ -82,7 +84,7 @@ export default class Point {
     const prevItemEditionComponent = this._tripItemEditionComponent;
 
     this._tripItemComponent = new TripItemView(this._item);
-    this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, TYPES, CITIES);
+    this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, destinations, TYPES);
 
     this._tripItemComponent.setRollupBtnClickHandler(this._tripItemRollupBtnClickHandler);
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);

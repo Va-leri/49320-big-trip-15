@@ -47,11 +47,15 @@ const generatePictures = () => {
   return photosArr;
 };
 
-const generateDestination = () => ({
+const generateDestination = (city) => ({
   description: generateDescription(),
-  name: generateRandomItem(CITIES),
+  name: city,
   pictures: generatePictures(),
 });
+
+const generateDestinations = () => CITIES.map((city) => generateDestination(city));
+
+const destinations = generateDestinations();
 
 const offersTitles = ['Choose meal', 'Choose seat', 'Upgrade to comfort', 'Add luggage', 'Add massage', 'Unlimited alcohol', 'WiFi'];
 
@@ -62,7 +66,7 @@ const generateOffers = () => {
   });
 
   const getOffersArr = () => {
-    const offersCount = getRandomInteger(2, 5);
+    const offersCount = getRandomInteger(0, 5);
     const startIndex = getRandomInteger(0, offersTitles.length - offersCount);
     const endIndex = startIndex + offersCount;
 
@@ -87,8 +91,8 @@ const generateItemOffers = (currentType) => {
 };
 
 const generateTripItem = (index = 0, previousPointEndDate) => {
-  // const isDestination = Boolean(getRandomInteger(0, 1));
-  const isDestination = true;
+  const isDestination = Boolean(getRandomInteger(0, 1));
+  // const isDestination = true;
   const areOffers = Boolean(getRandomInteger(0, 1));
   const type = generateRandomItem(TYPES);
   const dates = generateDates(previousPointEndDate);
@@ -100,7 +104,7 @@ const generateTripItem = (index = 0, previousPointEndDate) => {
     id: index,
     basePrice: getRandomInteger(0, 5000),
     offers: areOffers ? generateItemOffers(type) : [],
-    destination: isDestination ? generateDestination() : undefined,
+    destination: isDestination ? destinations[getRandomInteger(0, destinations.length - 1)] : undefined,
     isFavorite: Boolean(getRandomInteger(0, 1)),
   };
 };
@@ -119,4 +123,4 @@ const generateTripItems = (tripItemsCount) => {
 
 const tripItems = generateTripItems(TRIP_ITEMS_COUNT);
 
-export { tripItems, offersByType };
+export { tripItems, offersByType, destinations };

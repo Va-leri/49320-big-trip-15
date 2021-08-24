@@ -9,7 +9,7 @@ export const BLANC_POINT = {
   dateFrom: undefined,
   dateTo: undefined,
   id: undefined,
-  basePrice: undefined,
+  basePrice: '',
   offers: [],
   destination: undefined,
   isFavorite: false,
