@@ -22,5 +22,6 @@ export default class Smart extends AbstractView {
       return;
     }
     this.updateElement();
+    this.restoreHandlers();
   }
 }

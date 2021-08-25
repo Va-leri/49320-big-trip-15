@@ -150,7 +150,6 @@ export default class TripItemEdition extends SmartView {
   resetState(data) {
     data = data ? data : BLANC_POINT;
     this.updateState(TripItemEdition.parseDataToState(data, this._offersByType));
-    this.restoreHandlers();
   }
 
   static parseDataToState(data, offersByType) {
@@ -204,7 +203,6 @@ export default class TripItemEdition extends SmartView {
     } else {
       newValue = {
         destination: this._destinations.find((item) => item.name === evt.target.value),
-        basePrice: '',
         isDestination: true,
       };
     }
