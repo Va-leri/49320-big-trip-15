@@ -1,6 +1,8 @@
 import { humanizeDate } from '../utils/common.js';
 import { BLANC_POINT } from '../const.js';
-import AbstractView from './abstract.js';
+// import AbstractView from './abstract.js';
+import SmartView from './smart.js';
+import { nanoid } from 'nanoid';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -9,16 +11,20 @@ const createTripTypesTemplate = (tripTypes) => tripTypes.map((type) => `<div cla
     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
   </div>`).join('');
 
-const createDestinationsTemplate = (destinationsArr) => destinationsArr.map((destination) => `<option value="${destination}"></option>`).join('');
+const createDestinationsListTemplate = (destinationsArr) => destinationsArr.map((destination) => `<option value="${destination.name}"></option>`).join('');
 
-const createOffersTemplate = (availabelOffers, activeOffers) => {
+const createOffersTemplate = (areAvailableOffers, offersByType, tripType, activeOffers) => {
+  if (!areAvailableOffers) {
+    return '';
+  }
+  const availabelOffers = offersByType.find((item) => item.type === tripType).offers;
   const offersList = availabelOffers.map(({ title, price }) => {
-    const isActive = activeOffers ?
+    const isActive = activeOffers.length ?
       Boolean(activeOffers.find((item) => item.title === title))
       : false;
     return `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1" type="checkbox" name="event-offer-${title}" ${isActive ? 'checked' : ''}>
-            <label class="event__offer-label" for="event-offer-${title}-1">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title.replaceAll(' ', '-')}-1" type="checkbox" name="event-offer-${title.replaceAll(' ', '-')}" ${isActive ? 'checked' : ''}>
+            <label class="event__offer-label" for="event-offer-${title.replaceAll(' ', '-')}-1">
               <span class="event__offer-title">${title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${price}</span>
@@ -35,7 +41,12 @@ const createOffersTemplate = (availabelOffers, activeOffers) => {
   </section>`;
 };
 
-const crateDestinationDescriptionTemplate = ({ description, pictures }) => (`<section class="event__section  event__section--destination">
+const createDestinationDescriptionTemplate = (isDestination, destination) => {
+  if (!isDestination) {
+    return '';
+  }
+  const { description, pictures } = destination;
+  return `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
     <p class="event__destination-description">${description}</p>
 
@@ -44,16 +55,19 @@ const crateDestinationDescriptionTemplate = ({ description, pictures }) => (`<se
       ${pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="${picture.description}">`).join('')}
       </div>
     </div>
-  </section>`);
+  </section>`;
+};
 
-const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, destination, offers }, offersByType, tripTypes, destinations) => {
+const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes) => {
+  const { type, dateFrom, dateTo, basePrice, destination, offers, isDestination, areAvailableOffers } = state;
 
-  const availabelOffers = offersByType.find((item) => item.type === type).offers;
-  const offersTemplate = createOffersTemplate(availabelOffers, offers);
+  const offersTemplate = createOffersTemplate(areAvailableOffers, offersByType, type, offers);
+
+  const destinationsTemplate = createDestinationsListTemplate(destinations);
 
   const tripTypesTemplate = createTripTypesTemplate(tripTypes);
-  const destinationsTemplate = createDestinationsTemplate(destinations);
-  const destinationDescriptionTemplate = destination ? crateDestinationDescriptionTemplate(destination) : '';
+  const destinationDescriptionTemplate = createDestinationDescriptionTemplate(isDestination, destination);
+
 
   return `<li class="trip-events__item">
     <form class="event event--edit" action="#" method="post">
@@ -77,7 +91,7 @@ const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, dest
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? destination.name : ''}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${isDestination ? destination.name : ''}" list="destination-list-1">
           <datalist id="destination-list-1">
             ${destinationsTemplate}
           </datalist>
@@ -96,7 +110,7 @@ const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, dest
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${destination ? basePrice : ''}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${isDestination ? basePrice : ''}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -115,26 +129,128 @@ const createTripItemEditionTemplate = ({ type, dateFrom, dateTo, basePrice, dest
   </li>`;
 };
 
-export default class TripItemEdition extends AbstractView {
-  constructor(tripPoint, offersByType, tripTypes, destinations) {
+export default class TripItemEdition extends SmartView {
+  constructor(tripItemData, offersByType, destinations, tripTypes) {
     super();
-    this._pointData = tripPoint || BLANC_POINT;
-    this._offers = offersByType;
+    this._state = TripItemEdition.parseDataToState(tripItemData || BLANC_POINT, offersByType);
+    this._offersByType = offersByType;
     this._tripTypes = tripTypes;
     this._destinations = destinations;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
+    this._onDestinationChange = this._onDestinationChange.bind(this);
+    this._onTripTypeClick = this._onTripTypeClick.bind(this);
+    this._onOfferCheckboxChange = this._onOfferCheckboxChange.bind(this);
+    this._onPriceInputChange = this._onPriceInputChange.bind(this);
+
+    this._setInnerHandlers();
   }
 
+  resetState(data) {
+    data = data ? data : BLANC_POINT;
+    this.updateState(TripItemEdition.parseDataToState(data, this._offersByType));
+  }
 
-  getTemplate() {
-    return createTripItemEditionTemplate(this._pointData, this._offers, this._tripTypes, this._destinations);
+  static parseDataToState(data, offersByType) {
+    return Object.assign({}, data, {
+      isDestination: data.destination !== undefined,
+      areAvailableOffers: Boolean(offersByType.find((item) => item.type === data.type).offers.length),
+    });
+  }
+
+  static parseStateToData(state) {
+    const newData = Object.assign({}, state);
+    if (!state.isDestination) {
+      newData.destination = undefined;
+    }
+
+    if (!state.areAvailableOffers) {
+      newData.offers = [];
+    }
+
+    if (state.id === undefined) {
+      newData.id = nanoid();
+    }
+
+    delete newData.isDestination;
+    delete newData.areAvailableOffers;
+    return newData;
+  }
+
+  _setInnerHandlers() {
+
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._onTripTypeClick);
+    this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._onOfferCheckboxChange));
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._onPriceInputChange);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+
+    this.setFormSubmitHadler(this._callback.formSubmit);
+    this.setRollupBtnClickHandler(this._callback.rollupBtnClick);
+  }
+
+  _onDestinationChange(evt) {
+    let newValue;
+    if (!evt.target.value) {
+      newValue = {
+        destination: undefined,
+        isDestination: false,
+      };
+    } else {
+      newValue = {
+        destination: this._destinations.find((item) => item.name === evt.target.value),
+        isDestination: true,
+      };
+    }
+
+    this.updateState(newValue);
+    this.restoreHandlers();
+  }
+
+  _onTripTypeClick(evt) {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+
+    const offersByType = this._offersByType;
+
+    const newValue = {
+      type: evt.target.value,
+      offers: [],
+      areAvailableOffers: Boolean(offersByType.find((item) => item.type === evt.target.value).offers.length),
+    };
+
+    this.updateState(newValue);
+    this.restoreHandlers();
+  }
+
+  _onOfferCheckboxChange(evt) {
+    const input = evt.target;
+    const offerTitle = input.parentNode.querySelector('.event__offer-title').innerText;
+    let activeOffers;
+    if (input.checked) {
+      activeOffers = this._state.offers.slice();
+      const availabelOffers = this._offersByType.find((offers) => offers.type === this._state.type).offers;
+      const newOffer = availabelOffers.find((offer) => offer.title === offerTitle);
+      activeOffers.push(newOffer);
+    } else {
+      activeOffers = this._state.offers.filter((offer) => offer.title !== offerTitle);
+    }
+    this.updateState({ offers: activeOffers }, false);
+    this.restoreHandlers();
+  }
+
+  _onPriceInputChange(evt) {
+    this.updateState({ basePrice: evt.target.value }, false);
   }
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(TripItemEdition.parseStateToData(this._state));
   }
 
   setFormSubmitHadler(callback) {
@@ -150,5 +266,9 @@ export default class TripItemEdition extends AbstractView {
   setRollupBtnClickHandler(callback) {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupBtnClickHandler);
     this._callback.rollupBtnClick = callback;
+  }
+
+  getTemplate() {
+    return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes);
   }
 }

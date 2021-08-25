@@ -3,8 +3,8 @@ import AbstractView from './abstract';
 
 const createTripRouteTemplate = (tripPointsArr) =>
   tripPointsArr.length > 3 ?
-    `${tripPointsArr[0].destination.name} &mdash;...&mdash; ${tripPointsArr[tripPointsArr.length - 1].destination.name}` :
-    `${tripPointsArr.map(({ destination }) => destination.name).join(' &mdash; ')}`;
+    `${tripPointsArr[0].destination ? tripPointsArr[0].destination.name : '...'} &mdash;...&mdash; ${tripPointsArr[tripPointsArr.length - 1].destination ? tripPointsArr[tripPointsArr.length - 1].destination.name : '...'}` :
+    `${tripPointsArr.map(({ destination }) => destination ? destination.name : '...').join(' &mdash; ')}`;
 
 const createTripDatesTemplate = (tripPointsArr) =>
   `${humanizeDate(tripPointsArr[0].dateFrom, 'MMM DD')} &mdash; ${humanizeDate(tripPointsArr[tripPointsArr.length - 1].dateTo, 'MMM DD')}`;
