@@ -1,8 +1,9 @@
 import { humanizeDate } from '../utils/common.js';
 import { BLANC_POINT } from '../const.js';
-// import AbstractView from './abstract.js';
 import SmartView from './smart.js';
 import { nanoid } from 'nanoid';
+import flatpickr from 'flatpickr';
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -59,7 +60,7 @@ const createDestinationDescriptionTemplate = (isDestination, destination) => {
 };
 
 const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes) => {
-  const { type, dateFrom, dateTo, basePrice, destination, offers, isDestination, areAvailableOffers } = state;
+  const { type, dateFrom, dateTo, id, basePrice, destination, offers, isDestination, areAvailableOffers } = state;
 
   const offersTemplate = createOffersTemplate(areAvailableOffers, offersByType, type, offers);
 
@@ -99,10 +100,10 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${humanizeDate(dateFrom, 'DD/MM/YY HH:mm')}">
+          <input class="event__input  event__input--time" id="event-start-time-${id}" type="text" name="event-start-time" value="${humanizeDate(dateFrom, 'DD/MM/YY HH:mm')}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${humanizeDate(dateTo, 'DD/MM/YY HH:mm')}">
+          <input class="event__input  event__input--time" id="event-end-time-${id}" type="text" name="event-end-time" value="${humanizeDate(dateTo, 'DD/MM/YY HH:mm')}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -110,7 +111,7 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${isDestination ? basePrice : ''}">
+          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -143,8 +144,11 @@ export default class TripItemEdition extends SmartView {
     this._onTripTypeClick = this._onTripTypeClick.bind(this);
     this._onOfferCheckboxChange = this._onOfferCheckboxChange.bind(this);
     this._onPriceInputChange = this._onPriceInputChange.bind(this);
+    this._onDateChange = this._onDateChange.bind(this);
+    // this._onDateFieldGroupClick = this._onDateFieldGroupClick.bind(this);
 
     this._setInnerHandlers();
+    this._setDatepicker();
   }
 
   resetState(data) {
@@ -184,10 +188,12 @@ export default class TripItemEdition extends SmartView {
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._onTripTypeClick);
     this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._onOfferCheckboxChange));
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._onPriceInputChange);
+    // this.getElement().querySelector('.event__field-group--time').addEventListener('click', this._onDateFieldGroupClick);
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepicker();
 
     this.setFormSubmitHadler(this._callback.formSubmit);
     this.setRollupBtnClickHandler(this._callback.rollupBtnClick);
@@ -208,7 +214,44 @@ export default class TripItemEdition extends SmartView {
     }
 
     this.updateState(newValue);
-    this.restoreHandlers();
+  }
+
+  _onDateChange([date], dateStr, datepicker) {
+    this.updateState({ [datepicker.config.dateType]: date });
+  }
+
+  _setDatepicker() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+
+    const dateInput = {
+      start: this.getElement().querySelector(`#event-start-time-${this._state.id}`),
+      end: this.getElement().querySelector(`#event-end-time-${this._state.id}`),
+    };
+    this._datepickerStart = flatpickr(dateInput.start, {
+      defaultDate: this._state.dateFrom,
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      'time_24hr': true,
+      maxDate: this._state.dateTo,
+      onChange: this._onDateChange,
+      dateType: 'dateFrom',
+    });
+
+    this._datepickerEnd = flatpickr(dateInput.end, {
+      defaultDate: this._state.dateTo,
+      dateFormat: 'd/m/y H:i',
+      enableTime: true,
+      'time_24hr': true,
+      minDate: this._state.dateFrom,
+      onChange: this._onDateChange,
+      dateType: 'dateTo',
+    });
+
   }
 
   _onTripTypeClick(evt) {
@@ -225,7 +268,6 @@ export default class TripItemEdition extends SmartView {
     };
 
     this.updateState(newValue);
-    this.restoreHandlers();
   }
 
   _onOfferCheckboxChange(evt) {
@@ -241,7 +283,6 @@ export default class TripItemEdition extends SmartView {
       activeOffers = this._state.offers.filter((offer) => offer.title !== offerTitle);
     }
     this.updateState({ offers: activeOffers }, false);
-    this.restoreHandlers();
   }
 
   _onPriceInputChange(evt) {
