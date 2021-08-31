@@ -1,6 +1,6 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { offersByType, destinations } from '../model/trip-item-mock.js';
+import { offersByType, destinations } from '../mock/trip-item-mock.js';
 import { TYPES, KeyCode, RenderPosition } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 

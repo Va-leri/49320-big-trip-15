@@ -7,7 +7,8 @@ import ViewMenuView from '../view/view-menu.js';
 import FiltersView from '../view/filters.js';
 
 export default class TripMain {
-  constructor(tripMainContainer) {
+  constructor(tripMainContainer, tripItemsModel) {
+    this._tripItemsModel = tripItemsModel;
     this._tripMainContainer = tripMainContainer;
     this._tripMain = new TripMainView;
     this._viewMenu = new ViewMenuView;
@@ -18,13 +19,17 @@ export default class TripMain {
     this._tripControlsFiltersElement = this._tripMain.getElement().querySelector('.trip-controls__filters');
   }
 
-  init(items) {
-    this._tripPrice = new TripPriceView(items);
-    this._tripInfo = new TripInfoView(items);
+  init() {
+    this._tripPrice = new TripPriceView(this._getTripItems());
+    this._tripInfo = new TripInfoView(this._getTripItems());
     this._renderTripMain();
-    if (items.length) {
+    if (this._getTripItems().length) {
       this._renderTripInfo();
     }
+  }
+
+  _getTripItems() {
+    return this._tripItemsModel.tripItems;
   }
 
   _renderTripInfo() {

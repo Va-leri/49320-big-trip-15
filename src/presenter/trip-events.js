@@ -11,7 +11,8 @@ import dayjs from 'dayjs';
 const defaultSortType = SortType.DAY;
 
 export default class TripEvents {
-  constructor(tripEventsContainer) {
+  constructor(tripEventsContainer, tripItemsModel) {
+    this._tripItemsModel = tripItemsModel;
     this._tripEventsContainer = tripEventsContainer;
     this._tripEvents = new TripEventsView();
     this._tripItemsList = new TripItemsListView();
@@ -27,15 +28,18 @@ export default class TripEvents {
     this._sortFunctionByType = new Map();
   }
 
-  init(items) {
-    this._items = items;
+  init() {
     this._sortFunctionByType.set(SortType.DAY, this._sortByDay);
     this._sortFunctionByType.set(SortType.PRICE, this._sortByPrice);
     this._sortFunctionByType.set(SortType.TIME, this._sortByTime);
-    this._sortItems(this._currentSortType);
     render(this._tripEventsContainer, this._tripEvents, RenderPosition.BEFOREEND);
 
-    this._renderTripEvents(this._items);
+    this._renderTripEvents();
+  }
+
+  _getTripItems() {
+    const sortFunction = this._sortFunctionByType.get(this._currentSortType);
+    return this._tripItemsModel.tripItems.slice().sort(sortFunction);
   }
 
   _sortByDay(itemA, itemB) {
@@ -51,7 +55,7 @@ export default class TripEvents {
   }
 
   _fillTripItemsList() {
-    this._items.forEach((item) => {
+    this._getTripItems().forEach((item) => {
       this._renderTripItem(item);
     });
   }
@@ -71,13 +75,6 @@ export default class TripEvents {
     this._tripSort.setSortTypeChangeHandler(this._handleTripSort);
   }
 
-
-  _sortItems(sortType) {
-    const sortFunction = this._sortFunctionByType.get(sortType);
-    this._items.sort((itemA, itemB) => sortFunction(itemA, itemB));
-    this._currentSortType = sortType;
-  }
-
   _clearTripItemsList() {
     this._pointPresenter.forEach((presenter) => presenter.destroy());
     this._pointPresenter.clear();
@@ -87,7 +84,7 @@ export default class TripEvents {
     if (this._currentSortType === sortType) {
       return;
     }
-    this._sortItems(sortType);
+    this._currentSortType = sortType;
     this._clearTripItemsList();
     this._fillTripItemsList();
   }
@@ -98,7 +95,7 @@ export default class TripEvents {
   }
 
   _renderTripEvents() {
-    if (this._items.every((item) => !item)) {
+    if (this._getTripItems().every((item) => !item)) {
       this._renderNoPoints();
     } else {
       this._renderTripSort();
