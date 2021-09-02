@@ -1,7 +1,7 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { offersByType, destinations } from '../mock/trip-item-mock.js';
-import { TYPES, KeyCode, RenderPosition } from '../const.js';
+import { destinations } from '../mock/trip-item-mock.js';
+import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 
 const Mode = {
@@ -11,7 +11,8 @@ const Mode = {
 
 
 export default class Point {
-  constructor(itemsList, changeHandler, changeMode) {
+  constructor(itemsList, changeHandler, changeMode, offersModel) {
+    this._offersModel = offersModel;
     this._itemsList = itemsList;
     this._tripItemComponent = null;
     this._tripItemEditionComponent = null;
@@ -63,13 +64,21 @@ export default class Point {
   }
 
   _formSubmitHadler(data) {
-    this._handleTripItemChange(data);
+    this._handleTripItemChange(
+      UserAction.UPDATE_TRIP_POINT,
+      UpdateType.MINOR,
+      data,
+    );
     this._replaceFormToItem();
   }
 
   _handleFavoriteClick() {
     const newItem = Object.assign({}, this._item, { 'isFavorite': !this._item.isFavorite });
-    this._handleTripItemChange(newItem);
+    this._handleTripItemChange(
+      UserAction.UPDATE_TRIP_POINT,
+      UpdateType.PATCH,
+      newItem,
+    );
   }
 
   destroy() {
@@ -84,7 +93,7 @@ export default class Point {
     const prevItemEditionComponent = this._tripItemEditionComponent;
 
     this._tripItemComponent = new TripItemView(this._item);
-    this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, destinations, TYPES);
+    this._tripItemEditionComponent = new TripItemEditionView(this._item, this._offersModel.offers, destinations, TYPES);
 
     this._tripItemComponent.setRollupBtnClickHandler(this._tripItemRollupBtnClickHandler);
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);

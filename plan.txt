@@ -1,0 +1,3 @@
+Создать вспомогательные функции isFutereEvent и isPastEvent в utils
+Добавить функцию удаления элемента из tripItemEdition
+Добавить обработчик клика по кнопке Delete

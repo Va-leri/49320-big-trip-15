@@ -25,10 +25,14 @@ const generateDescription = () => {
 };
 
 const generateDates = (previousPointEndDate) => {
-  const startDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
+  let startDayGap = getRandomInteger(0, 30) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
   const endDayGap = getRandomInteger(0, 10) * 24 * 60 + getRandomInteger(0, 23) * 60 + getRandomInteger(0, 59);
-  const dateFrom = dayjs(previousPointEndDate).add(startDayGap, 'minute').toDate();
+
+  startDayGap = previousPointEndDate ? startDayGap : getRandomInteger(-1, 1) * startDayGap - endDayGap;
+
+  const dateFrom = dayjs(previousPointEndDate || new Date()).add(startDayGap, 'minute').toDate();
   const dateTo = dayjs(dateFrom).add(endDayGap, 'minute').toDate();
+
   previousPointEndDate = dateTo;
   return {
     from: dateFrom,
@@ -111,7 +115,7 @@ const generateTripItem = (index = 0, previousPointEndDate) => {
 
 const generateTripItems = (tripItemsCount) => {
   const items = [];
-  let previousPointEndDate = new Date();
+  let previousPointEndDate = undefined;
   for (let i = 0; i < tripItemsCount; i++) {
     const item = generateTripItem(i, previousPointEndDate);
     previousPointEndDate = item.dateTo;
