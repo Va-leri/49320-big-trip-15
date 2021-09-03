@@ -88,6 +88,9 @@ export default class TripMain {
         this._renderTripInfo();
         break;
       case UpdateType.MAJOR:
+        this._clearFilter();
+        this._renderFilter();
+
         this._clearTripInfo();
         this._renderTripInfo();
         break;

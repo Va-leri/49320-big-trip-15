@@ -24,7 +24,6 @@ export default class TripEvents {
     this._pointPresenter = new Map();
     this._currentSortType = defaultSortType;
 
-    // this._handleTripItemChange = this._handleTripItemChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleTripSort = this._handleTripSort.bind(this);
 
@@ -50,10 +49,6 @@ export default class TripEvents {
     this._activeFilter = this._filterModel.activeFilter;
     const tripItems = this._tripItemsModel.tripItems;
     const filteredTripItems = filterItems[this._activeFilter](tripItems);
-
-    /* if (!filteredTripItems) {
-      return filteredTripItems;
-    } */
 
     const sortFunction = this._sortFunctionByType.get(this._currentSortType);
     return filteredTripItems.slice().sort(sortFunction);
@@ -125,6 +120,8 @@ export default class TripEvents {
   }
 
   _clearTripEvents() {
+    this._clearTripItemsList();
+
     remove(this._noPoints);
     remove(this._tripSort);
     remove(this._tripItemsList);

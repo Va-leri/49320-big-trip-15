@@ -145,7 +145,7 @@ export default class TripItemEdition extends SmartView {
     this._onOfferCheckboxChange = this._onOfferCheckboxChange.bind(this);
     this._onPriceInputChange = this._onPriceInputChange.bind(this);
     this._onDateChange = this._onDateChange.bind(this);
-    // this._onDateFieldGroupClick = this._onDateFieldGroupClick.bind(this);
+    this._deleteBtnClickHandler = this._deleteBtnClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -309,7 +309,28 @@ export default class TripItemEdition extends SmartView {
     this._callback.rollupBtnClick = callback;
   }
 
+  _deleteBtnClickHandler() {
+    this._callback.deleteBtnClick(TripItemEdition.parseStateToData(this._state));
+  }
+
+  setDeleteBtnClickHandler(callback) {
+    this._callback.deleteBtnClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteBtnClickHandler);
+  }
+
   getTemplate() {
     return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerEnd.destroy();
+
+      this._datepickerStart = null;
+      this._datepickerEnd = null;
+    }
   }
 }

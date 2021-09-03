@@ -14,8 +14,8 @@ export default class TripItems extends AbstractObservable {
     return this._tripItems;
   }
 
-  updateItem(updateType, newItem) {
-    const index = this._tripItems.findIndex((item) => item.id === newItem.id);
+  updateItem(updateType, updatedItem) {
+    const index = this._tripItems.findIndex((item) => item.id === updatedItem.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting trip point');
@@ -23,11 +23,11 @@ export default class TripItems extends AbstractObservable {
 
     this._tripItems = [
       ...this._tripItems.slice(0, index),
-      newItem,
+      updatedItem,
       ...this._tripItems.slice(index + 1),
     ];
 
-    this._notify(updateType, newItem);
+    this._notify(updateType, updatedItem);
   }
 
   addItem(updateType, newItem) {
@@ -36,15 +36,15 @@ export default class TripItems extends AbstractObservable {
     this._notify(updateType, newItem);
   }
 
-  deleteItem(updateType, newItem) {
-    const index = this._tripItems.findIndex((item) => item.id === newItem.id);
+  deleteItem(updateType, deletedItem) {
+    const index = this._tripItems.findIndex((item) => item.id === deletedItem.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting task');
     }
 
-    this._tripItems.splice(index);
+    this._tripItems.splice(index, 1);
 
-    this._notify(updateType, newItem);
+    this._notify(updateType, deletedItem);
   }
 }
