@@ -183,12 +183,12 @@ export default class TripItemEdition extends SmartView {
   }
 
   _setInnerHandlers() {
-
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this._destinationInput = this.getElement().querySelector('.event__input--destination');
+    this._destinationInput.addEventListener('change', this._onDestinationChange);
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._onTripTypeClick);
     this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._onOfferCheckboxChange));
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._onPriceInputChange);
-    // this.getElement().querySelector('.event__field-group--time').addEventListener('click', this._onDateFieldGroupClick);
+    this._submitBtn = this.getElement().querySelector('.event__save-btn');
   }
 
   restoreHandlers() {
@@ -201,14 +201,26 @@ export default class TripItemEdition extends SmartView {
 
   _onDestinationChange(evt) {
     let newValue;
+    if (this._submitBtn.disabled) {
+      this._submitBtn.removeAttribute('disabled');
+      this._destinationInput.setCustomValidity('');
+    }
+
     if (!evt.target.value) {
       newValue = {
         destination: undefined,
         isDestination: false,
       };
     } else {
+      const destination = this._destinations.find((item) => item.name === evt.target.value);
+      if (!destination) {
+        this._submitBtn.setAttribute('disabled', 'disabled');
+        this._destinationInput.setCustomValidity('Choose the correct destination from the list');
+        this._destinationInput.reportValidity();
+        return;
+      }
       newValue = {
-        destination: this._destinations.find((item) => item.name === evt.target.value),
+        destination,
         isDestination: true,
       };
     }
@@ -286,6 +298,7 @@ export default class TripItemEdition extends SmartView {
   }
 
   _onPriceInputChange(evt) {
+    evt.target.value = evt.target.value.replace(/[^\d]/g, '');
     this.updateState({ basePrice: evt.target.value }, false);
   }
 

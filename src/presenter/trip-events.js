@@ -6,7 +6,6 @@ import { RenderPosition, SortType, UserAction, UpdateType, FilterType } from '..
 import { render, remove } from '../utils/render.js';
 import PointPresenter from './point.js';
 import PointNewPresenter from './point-new.js';
-// import { updateItem } from '../utils/common.js';
 import dayjs from 'dayjs';
 import { filterItems } from '../utils/filter.js';
 
@@ -19,7 +18,6 @@ export default class TripEvents {
     this._filterModel = filterModel;
     this._tripEventsContainer = tripEventsContainer;
     this._tripEvents = new TripEventsView();
-    // this._tripItemsList = null;
     this._tripItemsList = new TripItemsListView();
 
     this._tripSort = null;
