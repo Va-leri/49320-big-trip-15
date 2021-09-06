@@ -79,6 +79,8 @@ export default class TripMain {
   _handleModelEvent(updateType) {
     switch (updateType) {
       case UpdateType.PATCH:
+        this._clearTripInfo();
+        this._renderTripInfo();
         break;
       case UpdateType.MINOR:
         this._clearFilter();
