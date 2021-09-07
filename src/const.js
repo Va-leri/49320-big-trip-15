@@ -30,3 +30,37 @@ export const SortType = {
   TIME: 'time',
   PRICE: 'price',
 };
+
+export const UserAction = {
+  UPDATE_TRIP_POINT: 'UPDATE_TRIP_POINT',
+  ADD_TRIP_POINT: 'ADD_TRIP_POINT',
+  DELETE_TRIP_POINT: 'DELETE_TRIP_POINT',
+  CHANGE_ACTIVE_FILTER: 'CHANGE_ACTIVE_FILTER',
+};
+
+export const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export const FilterType = {
+  EVERITHING: 'everithing',
+  PAST: 'past',
+  FUTURE: 'future',
+};
+
+export const FILTERS = [
+  {
+    type: 'everithing',
+    name: 'EVERITHING',
+  },
+  {
+    type: 'past',
+    name: 'PAST',
+  },
+  {
+    type: 'future',
+    name: 'FUTURE',
+  },
+];

@@ -59,7 +59,7 @@ const createDestinationDescriptionTemplate = (isDestination, destination) => {
   </section>`;
 };
 
-const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes) => {
+const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes, isNew) => {
   const { type, dateFrom, dateTo, id, basePrice, destination, offers, isDestination, areAvailableOffers } = state;
 
   const offersTemplate = createOffersTemplate(areAvailableOffers, offersByType, type, offers);
@@ -111,14 +111,15 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">${isNew ? 'Cancel' : 'Delete'}</button>
+        ${!isNew ? `<button class="event__rollup-btn" type="button">
+          <span class="visually-hidden"> Open event</span>
+        </button>` : ''}
+
       </header>
       <section class="event__details">
 
@@ -131,12 +132,13 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
 };
 
 export default class TripItemEdition extends SmartView {
-  constructor(tripItemData, offersByType, destinations, tripTypes) {
+  constructor(tripItemData, offersByType, destinations, tripTypes, isNew = false) {
     super();
     this._state = TripItemEdition.parseDataToState(tripItemData || BLANC_POINT, offersByType);
     this._offersByType = offersByType;
     this._tripTypes = tripTypes;
     this._destinations = destinations;
+    this._isNew = isNew;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
@@ -145,7 +147,7 @@ export default class TripItemEdition extends SmartView {
     this._onOfferCheckboxChange = this._onOfferCheckboxChange.bind(this);
     this._onPriceInputChange = this._onPriceInputChange.bind(this);
     this._onDateChange = this._onDateChange.bind(this);
-    // this._onDateFieldGroupClick = this._onDateFieldGroupClick.bind(this);
+    this._deleteBtnClickHandler = this._deleteBtnClickHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -183,12 +185,12 @@ export default class TripItemEdition extends SmartView {
   }
 
   _setInnerHandlers() {
-
-    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._onDestinationChange);
+    this._destinationInput = this.getElement().querySelector('.event__input--destination');
+    this._destinationInput.addEventListener('change', this._onDestinationChange);
     this.getElement().querySelector('.event__type-list').addEventListener('click', this._onTripTypeClick);
     this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._onOfferCheckboxChange));
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._onPriceInputChange);
-    // this.getElement().querySelector('.event__field-group--time').addEventListener('click', this._onDateFieldGroupClick);
+    this._submitBtn = this.getElement().querySelector('.event__save-btn');
   }
 
   restoreHandlers() {
@@ -201,14 +203,26 @@ export default class TripItemEdition extends SmartView {
 
   _onDestinationChange(evt) {
     let newValue;
+    if (this._submitBtn.disabled) {
+      this._submitBtn.removeAttribute('disabled');
+      this._destinationInput.setCustomValidity('');
+    }
+
     if (!evt.target.value) {
       newValue = {
         destination: undefined,
         isDestination: false,
       };
     } else {
+      const destination = this._destinations.find((item) => item.name === evt.target.value);
+      if (!destination) {
+        this._submitBtn.setAttribute('disabled', 'disabled');
+        this._destinationInput.setCustomValidity('Choose the correct destination from the list');
+        this._destinationInput.reportValidity();
+        return;
+      }
       newValue = {
-        destination: this._destinations.find((item) => item.name === evt.target.value),
+        destination,
         isDestination: true,
       };
     }
@@ -286,6 +300,7 @@ export default class TripItemEdition extends SmartView {
   }
 
   _onPriceInputChange(evt) {
+    evt.target.value = evt.target.value.replace(/[^\d]/g, '');
     this.updateState({ basePrice: evt.target.value }, false);
   }
 
@@ -309,7 +324,28 @@ export default class TripItemEdition extends SmartView {
     this._callback.rollupBtnClick = callback;
   }
 
+  _deleteBtnClickHandler() {
+    this._callback.deleteBtnClick(TripItemEdition.parseStateToData(this._state));
+  }
+
+  setDeleteBtnClickHandler(callback) {
+    this._callback.deleteBtnClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteBtnClickHandler);
+  }
+
   getTemplate() {
-    return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes);
+    return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes, this._isNew);
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerEnd.destroy();
+
+      this._datepickerStart = null;
+      this._datepickerEnd = null;
+    }
   }
 }

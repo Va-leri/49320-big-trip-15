@@ -1,14 +1,28 @@
-import { tripItems } from './model/trip-item-mock.js';
+import { tripItems } from './mock/trip-item-mock.js';
 import TripMainPresenter from './presenter/trip-main.js';
 import TripEventsPresenter from './presenter/trip-events.js';
+import TripItemsModel from './model/trip-items.js';
+import FilterModel from './model/filter.js';
+import { FilterType } from './const.js';
+
+const tripItemsModel = new TripItemsModel();
+tripItemsModel.tripItems = tripItems;
+
+const defaultFilter = FilterType.EVERITHING;
+const filterModel = new FilterModel(defaultFilter);
 
 const pageMainElement = document.querySelector('.page-main');
 const pageBodyContainer = pageMainElement.querySelector('.page-body__container');
 const pageHeaderElement = document.querySelector('.page-header');
 const pageHeaderContainer = pageHeaderElement.querySelector('.page-header__container');
 
-const tripMainPresenter = new TripMainPresenter(pageHeaderContainer);
-tripMainPresenter.init(tripItems);
+const tripMainPresenter = new TripMainPresenter(pageHeaderContainer, tripItemsModel, filterModel);
+tripMainPresenter.init();
 
-const tripEventsPresenter = new TripEventsPresenter(pageBodyContainer);
-tripEventsPresenter.init(tripItems);
+const tripEventsPresenter = new TripEventsPresenter(pageBodyContainer, tripItemsModel, filterModel);
+tripEventsPresenter.init();
+
+document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  tripEventsPresenter.createTripItem();
+});

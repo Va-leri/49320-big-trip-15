@@ -1,8 +1,9 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { offersByType, destinations } from '../model/trip-item-mock.js';
-import { TYPES, KeyCode, RenderPosition } from '../const.js';
+import { destinations, offersByType } from '../mock/trip-item-mock.js';
+import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
+import { areDatesEqual } from '../utils/trip-item.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,6 +25,7 @@ export default class Point {
     this._formSubmitHadler = this._formSubmitHadler.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteBtnClick = this._handleDeleteBtnClick.bind(this);
   }
 
   _resetMode() {
@@ -62,14 +64,32 @@ export default class Point {
     this._replaceFormToItem();
   }
 
-  _formSubmitHadler(data) {
-    this._handleTripItemChange(data);
+  _formSubmitHadler(updatedItem) {
+    const updateType = areDatesEqual(updatedItem, this._item) ? UpdateType.PATCH : UpdateType.MINOR;
+
+    this._handleTripItemChange(
+      UserAction.UPDATE_TRIP_POINT,
+      updateType,
+      updatedItem,
+    );
     this._replaceFormToItem();
   }
 
   _handleFavoriteClick() {
     const newItem = Object.assign({}, this._item, { 'isFavorite': !this._item.isFavorite });
-    this._handleTripItemChange(newItem);
+    this._handleTripItemChange(
+      UserAction.UPDATE_TRIP_POINT,
+      UpdateType.PATCH,
+      newItem,
+    );
+  }
+
+  _handleDeleteBtnClick(deletedItem) {
+    this._handleTripItemChange(
+      UserAction.DELETE_TRIP_POINT,
+      UpdateType.MINOR,
+      deletedItem,
+    );
   }
 
   destroy() {
@@ -89,6 +109,7 @@ export default class Point {
     this._tripItemComponent.setRollupBtnClickHandler(this._tripItemRollupBtnClickHandler);
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);
 
+    this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
     this._tripItemEditionComponent.setFormSubmitHadler(this._formSubmitHadler);
 
     this._tripItemEditionComponent.setRollupBtnClickHandler(this._tripItemFormRollupBtnClickHandler);
