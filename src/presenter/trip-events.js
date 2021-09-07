@@ -12,9 +12,8 @@ import { filterItems } from '../utils/filter.js';
 const defaultSortType = SortType.DAY;
 
 export default class TripEvents {
-  constructor(tripEventsContainer, tripItemsModel, filterModel, offersModel) {
+  constructor(tripEventsContainer, tripItemsModel, filterModel) {
     this._tripItemsModel = tripItemsModel;
-    this._offersModel = offersModel;
     this._filterModel = filterModel;
     this._tripEventsContainer = tripEventsContainer;
     this._tripEvents = new TripEventsView();
@@ -39,7 +38,7 @@ export default class TripEvents {
     this._sortFunctionByType.set(SortType.PRICE, this._sortByPrice);
     this._sortFunctionByType.set(SortType.TIME, this._sortByTime);
 
-    this._pointNewPresenter = new PointNewPresenter(this._tripItemsList, this._handleViewAction, this._handleModeChange, this._offersModel);
+    this._pointNewPresenter = new PointNewPresenter(this._tripItemsList, this._handleViewAction, this._handleModeChange);
   }
 
   init() {
@@ -82,7 +81,7 @@ export default class TripEvents {
   }
 
   _renderTripItem(item) {
-    const pointPresenter = new PointPresenter(this._tripItemsList, this._handleViewAction, this._handleModeChange, this._offersModel);
+    const pointPresenter = new PointPresenter(this._tripItemsList, this._handleViewAction, this._handleModeChange);
     pointPresenter.init(item);
     this._pointPresenter.set(item.id, pointPresenter);
   }

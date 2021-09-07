@@ -1,6 +1,6 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { destinations } from '../mock/trip-item-mock.js';
+import { destinations, offersByType } from '../mock/trip-item-mock.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 import { areDatesEqual } from '../utils/trip-item.js';
@@ -12,8 +12,7 @@ const Mode = {
 
 
 export default class Point {
-  constructor(itemsList, changeHandler, changeMode, offersModel) {
-    this._offersModel = offersModel;
+  constructor(itemsList, changeHandler, changeMode) {
     this._itemsList = itemsList;
     this._tripItemComponent = null;
     this._tripItemEditionComponent = null;
@@ -105,7 +104,7 @@ export default class Point {
     const prevItemEditionComponent = this._tripItemEditionComponent;
 
     this._tripItemComponent = new TripItemView(this._item);
-    this._tripItemEditionComponent = new TripItemEditionView(this._item, this._offersModel.offers, destinations, TYPES);
+    this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, destinations, TYPES);
 
     this._tripItemComponent.setRollupBtnClickHandler(this._tripItemRollupBtnClickHandler);
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);

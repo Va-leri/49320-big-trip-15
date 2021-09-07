@@ -1,5 +1,4 @@
 import AbstractObservable from './abstract-observable';
-// import { FilterType } from '../const';
 
 export default class Filter extends AbstractObservable {
   constructor(activeFilter) {

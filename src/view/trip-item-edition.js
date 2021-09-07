@@ -59,7 +59,7 @@ const createDestinationDescriptionTemplate = (isDestination, destination) => {
   </section>`;
 };
 
-const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes) => {
+const createTripItemEditionTemplate = (state, offersByType, destinations, tripTypes, isNew) => {
   const { type, dateFrom, dateTo, id, basePrice, destination, offers, isDestination, areAvailableOffers } = state;
 
   const offersTemplate = createOffersTemplate(areAvailableOffers, offersByType, type, offers);
@@ -111,14 +111,15 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Delete</button>
-        <button class="event__rollup-btn" type="button">
-          <span class="visually-hidden">Open event</span>
-        </button>
+        <button class="event__reset-btn" type="reset">${isNew ? 'Cancel' : 'Delete'}</button>
+        ${!isNew ? `<button class="event__rollup-btn" type="button">
+          <span class="visually-hidden"> Open event</span>
+        </button>` : ''}
+
       </header>
       <section class="event__details">
 
@@ -131,12 +132,13 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
 };
 
 export default class TripItemEdition extends SmartView {
-  constructor(tripItemData, offersByType, destinations, tripTypes) {
+  constructor(tripItemData, offersByType, destinations, tripTypes, isNew = false) {
     super();
     this._state = TripItemEdition.parseDataToState(tripItemData || BLANC_POINT, offersByType);
     this._offersByType = offersByType;
     this._tripTypes = tripTypes;
     this._destinations = destinations;
+    this._isNew = isNew;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
@@ -332,7 +334,7 @@ export default class TripItemEdition extends SmartView {
   }
 
   getTemplate() {
-    return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes);
+    return createTripItemEditionTemplate(this._state, this._offersByType, this._destinations, this._tripTypes, this._isNew);
   }
 
   removeElement() {

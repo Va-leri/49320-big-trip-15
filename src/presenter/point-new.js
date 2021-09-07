@@ -1,5 +1,5 @@
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { destinations } from '../mock/trip-item-mock.js';
+import { destinations, offersByType } from '../mock/trip-item-mock.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../utils/render.js';
 import { nanoid } from 'nanoid';
@@ -11,8 +11,7 @@ const Mode = {
 
 
 export default class PointNew {
-  constructor(itemsList, changeHandler, changeMode, offersModel) {
-    this._offersModel = offersModel;
+  constructor(itemsList, changeHandler, changeMode) {
     this._itemsList = itemsList;
     this._tripItemEditionComponent = null;
     this._mode = Mode.DEFAULT;
@@ -59,7 +58,7 @@ export default class PointNew {
       return;
     }
 
-    this._tripItemEditionComponent = new TripItemEditionView(undefined, this._offersModel.offers, destinations, TYPES);
+    this._tripItemEditionComponent = new TripItemEditionView(undefined, offersByType, destinations, TYPES, true);
 
     this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
     this._tripItemEditionComponent.setFormSubmitHadler(this._formSubmitHadler);
@@ -67,22 +66,5 @@ export default class PointNew {
     render(this._itemsList, this._tripItemEditionComponent, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this._escKeydownHandler);
-
-    // const prevItemEditionComponent = this._tripItemEditionComponent;
-    // this._tripItemEditionComponent.setRollupBtnClickHandler(this._tripItemFormRollupBtnClickHandler);
-
-    /* if (!prevItemComponent || !prevItemEditionComponent) {
-      render(this._itemsList, this._tripItemComponent, RenderPosition.BEFOREEND);
-      return;
-    } */
-
-    /* if (this._mode === Mode.DEFAULT) {
-      replace(this._tripItemComponent, prevItemComponent);
-      return;
-    } */
-
-    // if (this._mode === Mode.EDITING) {
-    // replace(this._tripItemEditionComponent, prevItemEditionComponent);
-    // }
   }
 }
