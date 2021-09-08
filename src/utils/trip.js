@@ -1,18 +1,10 @@
 import dayjs from 'dayjs';
 
-export const getPointDuration = (from, to) => {
-  const durationInDays = dayjs(to).diff(dayjs(from), 'd');
-  const durationInHours = dayjs(to).diff(dayjs(from), 'h');
-  const durationInMinutes = dayjs(to).diff(dayjs(from), 'm');
-
+export const formatDate = (days, hours, minutes) => {
   const duration = {
-    D: durationInDays,
-    get H() {
-      return durationInHours - this.D * 24;
-    },
-    get M() {
-      return durationInMinutes - this.D * 24 * 60 - this.H * 60;
-    },
+    D: days,
+    H: hours - days * 24,
+    M: minutes - hours * 60,
   };
 
   const formatedDuration = Object.entries(duration).map(([units, value]) => {
@@ -25,4 +17,12 @@ export const getPointDuration = (from, to) => {
   }).join('');
 
   return formatedDuration;
+};
+
+export const getPointDuration = (from, to) => {
+  const durationInDays = dayjs(to).diff(dayjs(from), 'd');
+  const durationInHours = dayjs(to).diff(dayjs(from), 'h');
+  const durationInMinutes = dayjs(to).diff(dayjs(from), 'm');
+
+  return formatDate(durationInDays, durationInHours, durationInMinutes);
 };

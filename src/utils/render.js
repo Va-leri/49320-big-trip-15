@@ -20,9 +20,9 @@ export const render = (container, child, position) => {
   }
 };
 
-export const createElement = (temlate) => {
+export const createElement = (template) => {
   const newElement = document.createElement('div');
-  newElement.innerHTML = temlate;
+  newElement.innerHTML = template;
 
   return newElement.firstChild;
 };

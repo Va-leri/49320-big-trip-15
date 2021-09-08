@@ -17,6 +17,7 @@ export default class PointNew {
     this._mode = Mode.DEFAULT;
     this._handleTripItemChange = changeHandler;
     this._changeMode = changeMode;
+    this._destroyCallback = null;
 
     this._formSubmitHadler = this._formSubmitHadler.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
@@ -51,9 +52,15 @@ export default class PointNew {
     remove(this._tripItemEditionComponent);
     this._tripItemEditionComponent = null;
     document.removeEventListener('keydown', this._escKeydownHandler);
+
+    if (this._destroyCallback) {
+      this._destroyCallback();
+    }
   }
 
-  init() {
+  init(callback) {
+    this._destroyCallback = callback;
+
     if (this._tripItemEditionComponent !== null) {
       return;
     }
