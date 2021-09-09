@@ -24,3 +24,5 @@ export const updateItem = (itemsArr, newItem) => {
     ...itemsArr.slice(index + 1),
   ];
 };
+
+export const getArrayOfUnique = (itemsArr) => [...new Set(itemsArr)];

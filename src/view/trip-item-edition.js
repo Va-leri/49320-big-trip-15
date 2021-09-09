@@ -1,7 +1,6 @@
 import { humanizeDate } from '../utils/common.js';
 import { BLANC_POINT } from '../const.js';
 import SmartView from './smart.js';
-import { nanoid } from 'nanoid';
 import flatpickr from 'flatpickr';
 import '../../node_modules/flatpickr/dist/flatpickr.min.css';
 
@@ -160,6 +159,7 @@ export default class TripItemEdition extends SmartView {
 
   static parseDataToState(data, offersByType) {
     return Object.assign({}, data, {
+      basePrice: data.basePrice ? data.basePrice : '',
       isDestination: data.destination !== undefined,
       areAvailableOffers: Boolean(offersByType.find((item) => item.type === data.type).offers.length),
     });
@@ -175,8 +175,12 @@ export default class TripItemEdition extends SmartView {
       newData.offers = [];
     }
 
-    if (state.id === undefined) {
+    /* if (state.id === undefined) {
       newData.id = nanoid();
+    } */
+
+    if (!state.basePrice) {
+      newData.basePrice = 0;
     }
 
     delete newData.isDestination;
@@ -204,7 +208,7 @@ export default class TripItemEdition extends SmartView {
   _onDestinationChange(evt) {
     let newValue;
     if (this._submitBtn.disabled) {
-      this._submitBtn.removeAttribute('disabled');
+      this._submitBtn.disabled = false;
       this._destinationInput.setCustomValidity('');
     }
 
@@ -216,7 +220,7 @@ export default class TripItemEdition extends SmartView {
     } else {
       const destination = this._destinations.find((item) => item.name === evt.target.value);
       if (!destination) {
-        this._submitBtn.setAttribute('disabled', 'disabled');
+        this._submitBtn.disabled = true;
         this._destinationInput.setCustomValidity('Choose the correct destination from the list');
         this._destinationInput.reportValidity();
         return;

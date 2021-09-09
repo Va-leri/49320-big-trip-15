@@ -30,9 +30,6 @@ export default class TripEvents {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
-    this._tripItemsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-
     this._sortFunctionByType = new Map();
     this._sortFunctionByType.set(SortType.DAY, this._sortByDay);
     this._sortFunctionByType.set(SortType.PRICE, this._sortByPrice);
@@ -42,15 +39,27 @@ export default class TripEvents {
   }
 
   init() {
+    this._tripItemsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+
     render(this._tripEventsContainer, this._tripEvents, RenderPosition.BEFOREEND);
 
     this._renderTripEvents();
   }
 
-  createTripItem() {
+  destroy() {
+    this._clearTripEvents();
+    this._resetSortType();
+    remove(this._tripEvents);
+
+    this._tripItemsModel.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+
+  createTripItem(callback) {
     this._currentSortType = defaultSortType;
     this._filterModel.setActiveFilter(UpdateType.MAJOR, FilterType.EVERITHING);
-    this._pointNewPresenter.init();
+    this._pointNewPresenter.init(callback);
   }
 
   _getTripItems() {

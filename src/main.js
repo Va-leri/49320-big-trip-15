@@ -16,13 +16,8 @@ const pageBodyContainer = pageMainElement.querySelector('.page-body__container')
 const pageHeaderElement = document.querySelector('.page-header');
 const pageHeaderContainer = pageHeaderElement.querySelector('.page-header__container');
 
-const tripMainPresenter = new TripMainPresenter(pageHeaderContainer, tripItemsModel, filterModel);
-tripMainPresenter.init();
-
 const tripEventsPresenter = new TripEventsPresenter(pageBodyContainer, tripItemsModel, filterModel);
-tripEventsPresenter.init();
+const tripMainPresenter = new TripMainPresenter(pageHeaderContainer, pageBodyContainer, tripItemsModel, filterModel, tripEventsPresenter);
 
-document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripEventsPresenter.createTripItem();
-});
+tripMainPresenter.init();
+tripEventsPresenter.init();

@@ -36,7 +36,7 @@ const createTripItemTemplate = ({ type, dateFrom, dateTo, basePrice, destination
         <p class="event__duration">${pointDuration}</p>
       </div>
       <p class="event__price">
-        &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
+        &euro;&nbsp;<span class="event__price-value">${basePrice || ''}</span>
       </p>
       ${offersTemplate}
       <button class="event__favorite-btn ${favoriteClass}" type="button">
