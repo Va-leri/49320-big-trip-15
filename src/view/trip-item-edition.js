@@ -138,7 +138,6 @@ export default class TripItemEdition extends SmartView {
     this._tripTypes = tripTypes;
     this._destinations = destinations;
     this._isNew = isNew;
-    this._validity = true;
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
@@ -311,9 +310,6 @@ export default class TripItemEdition extends SmartView {
   }
 
   _formSubmitHandler(evt) {
-    if (!this._validity) {
-      return;
-    }
     evt.preventDefault();
     this._callback.formSubmit(TripItemEdition.parseStateToData(this._state));
   }
