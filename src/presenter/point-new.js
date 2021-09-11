@@ -1,8 +1,7 @@
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { destinations, offersByType } from '../mock/trip-item-mock.js';
+import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../utils/render.js';
-import { nanoid } from 'nanoid';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -35,7 +34,8 @@ export default class PointNew {
     this._handleTripItemChange(
       UserAction.ADD_TRIP_POINT,
       UpdateType.MAJOR,
-      Object.assign({ id: nanoid() }, newItem),
+      // Object.assign({ id: nanoid() }, newItem),
+      newItem,
     );
     this.destroy();
   }

@@ -40,4 +40,20 @@ export default class Filters extends AbstractView {
     this._callback.changeType = callback;
     this.getElement().addEventListener('click', this._onFilterTypeChange);
   }
+
+  disableFilters() {
+    this._filterElements = this.getElement().querySelectorAll('input[type="radio"]');
+    this._filterElements.forEach((element) => element.disabled = true);
+  }
+
+  /* enableFilters() {
+    this._filterElements = this.getElement().querySelectorAll('input[type="radio"]');
+    // console.log(this._filterElements);
+    this._filterElements.forEach((element) => {
+      if (!element.disabled) {
+        return;
+      }
+      element.disabled = false;
+    });
+  } */
 }

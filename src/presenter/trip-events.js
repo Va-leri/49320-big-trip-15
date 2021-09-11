@@ -8,21 +8,25 @@ import PointPresenter from './point.js';
 import PointNewPresenter from './point-new.js';
 import dayjs from 'dayjs';
 import { filterItems } from '../utils/filter.js';
+import LoadingView from '../view/loading.js';
 
 const defaultSortType = SortType.DAY;
 
 export default class TripEvents {
-  constructor(tripEventsContainer, tripItemsModel, filterModel) {
+  constructor(tripEventsContainer, tripItemsModel, filterModel, api) {
     this._tripItemsModel = tripItemsModel;
     this._filterModel = filterModel;
     this._tripEventsContainer = tripEventsContainer;
-    this._tripEvents = new TripEventsView();
-    this._tripItemsList = new TripItemsListView();
-
     this._tripSort = null;
     this._noPoints = null;
-    this._pointPresenter = new Map();
     this._currentSortType = defaultSortType;
+    this._isLoading = true;
+    this._api = api;
+
+    this._tripEvents = new TripEventsView();
+    this._tripItemsList = new TripItemsListView();
+    this._pointPresenter = new Map();
+    this._loadingComponent = new LoadingView();
 
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleTripSort = this._handleTripSort.bind(this);
@@ -43,7 +47,6 @@ export default class TripEvents {
     this._filterModel.addObserver(this._handleModelEvent);
 
     render(this._tripEventsContainer, this._tripEvents, RenderPosition.BEFOREEND);
-
     this._renderTripEvents();
   }
 
@@ -121,12 +124,21 @@ export default class TripEvents {
     this._fillTripItemsList();
   }
 
+  _renderLoading() {
+    render(this._tripEvents, this._loadingComponent, RenderPosition.BEFOREEND);
+  }
+
   _renderPointsList() {
     render(this._tripEvents, this._tripItemsList, RenderPosition.BEFOREEND);
     this._fillTripItemsList();
   }
 
   _renderTripEvents() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (this._getTripItems().every((item) => !item)) {
       this._renderNoPoints();
     } else {
@@ -155,13 +167,19 @@ export default class TripEvents {
   _handleViewAction(actionType, updateType, data) {
     switch (actionType) {
       case UserAction.UPDATE_TRIP_POINT:
-        this._tripItemsModel.updateItem(updateType, data);
+        this._api.updatePoint(data).then((response) => {
+          this._tripItemsModel.updateItem(updateType, response);
+        });
         break;
       case UserAction.ADD_TRIP_POINT:
-        this._tripItemsModel.addItem(updateType, data);
+        this._api.addNewPoint(data).then((response) => {
+          this._tripItemsModel.addItem(updateType, response);
+        });
         break;
       case UserAction.DELETE_TRIP_POINT:
-        this._tripItemsModel.deleteItem(updateType, data);
+        this._api.deletePoint(data).then(() => {
+          this._tripItemsModel.deleteItem(updateType, data);
+        });
         break;
     }
   }
@@ -171,14 +189,23 @@ export default class TripEvents {
       case UpdateType.PATCH:
         this._pointPresenter.get(data.id).init(data);
         break;
+
       case UpdateType.MINOR:
         this._clearTripEvents();
         this._renderTripEvents();
         break;
+
       case UpdateType.MAJOR:
         this._clearTripEvents();
         this._resetSortType();
-        this._renderTripEvents(data);
+        this._renderTripEvents();
+        break;
+
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+
+        this._renderTripEvents();
         break;
     }
   }

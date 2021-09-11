@@ -1,5 +1,5 @@
 import { render, remove } from '../utils/render.js';
-import { RenderPosition, UpdateType, MenuItem } from '../const.js';
+import { RenderPosition, UpdateType, MenuItem, FilterType } from '../const.js';
 import TripMainView from '../view/trip-main.js';
 import TripInfoView from '../view/trip-info.js';
 import TripPriceView from '../view/trip-price.js';
@@ -22,6 +22,9 @@ export default class TripMain {
     this._filtersForm = new FiltersView;
     this._tripInfo = null;
     this._tripPrice = null;
+    this._statisticsComponent = null;
+    this._isLoading = true;
+
     this._tripControlsNavigationElement = this._tripMain.getElement().querySelector('.trip-controls__navigation');
     this._tripControlsFiltersElement = this._tripMain.getElement().querySelector('.trip-controls__filters');
     this._addNewPointBtn = this._tripMain.getElement().querySelector('.trip-main__event-add-btn');
@@ -32,6 +35,7 @@ export default class TripMain {
     this._addNewPointClickHandler = this._addNewPointClickHandler.bind(this);
 
     this._tripItemsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -51,6 +55,10 @@ export default class TripMain {
   }
 
   _renderTripInfo() {
+    if (this._isLoading) {
+      return;
+    }
+
     const tripItems = this._getTripItems().slice();
 
     if (tripItems.length) {
@@ -127,6 +135,10 @@ export default class TripMain {
 
         // Установить соотв. пункт меню
         this._viewMenu.setActiveView(MenuItem.TABLE);
+
+        // Сбросить фильтр
+        this._filterModel.setActiveFilter(UpdateType.MAJOR, FilterType.EVERITHING);
+
         break;
       case MenuItem.STATISTICS:
         // Скрыть доску
@@ -138,6 +150,9 @@ export default class TripMain {
 
         // Установить соотв. пункт меню
         this._viewMenu.setActiveView(MenuItem.STATISTICS);
+
+        // Заблокировать фильтры
+        this._filtersPresenter.disableFilters();
         break;
     }
   }
@@ -148,6 +163,7 @@ export default class TripMain {
         this._clearTripInfo();
         this._renderTripInfo();
         break;
+
       case UpdateType.MINOR:
         this._clearFilter();
         this._renderFilter();
@@ -155,12 +171,23 @@ export default class TripMain {
         this._clearTripInfo();
         this._renderTripInfo();
         break;
+
       case UpdateType.MAJOR:
         this._clearFilter();
         this._renderFilter();
 
         this._clearTripInfo();
         this._renderTripInfo();
+        break;
+
+      case UpdateType.INIT:
+        this._isLoading = false;
+
+        this._clearFilter();
+        this._renderFilter();
+
+        this._renderTripInfo();
+
         break;
     }
   }
