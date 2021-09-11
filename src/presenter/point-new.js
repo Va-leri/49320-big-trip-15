@@ -34,7 +34,6 @@ export default class PointNew {
     this._handleTripItemChange(
       UserAction.ADD_TRIP_POINT,
       UpdateType.MAJOR,
-      // Object.assign({ id: nanoid() }, newItem),
       newItem,
     );
     this.destroy();

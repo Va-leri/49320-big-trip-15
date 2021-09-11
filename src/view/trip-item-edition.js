@@ -176,10 +176,6 @@ export default class TripItemEdition extends SmartView {
       newData.offers = [];
     }
 
-    /* if (state.id === undefined) {
-      newData.id = nanoid();
-    } */
-
     if (!state.basePrice) {
       newData.basePrice = 0;
     }
