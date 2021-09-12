@@ -91,7 +91,7 @@ const createTripItemEditionTemplate = (state, offersByType, destinations, tripTy
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${isDestination ? destination.name : ''}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${isDestination ? destination.name : ''}" list="destination-list-1" required>
           <datalist id="destination-list-1">
             ${destinationsTemplate}
           </datalist>
@@ -175,10 +175,6 @@ export default class TripItemEdition extends SmartView {
       newData.offers = [];
     }
 
-    /* if (state.id === undefined) {
-      newData.id = nanoid();
-    } */
-
     if (!state.basePrice) {
       newData.basePrice = 0;
     }
@@ -202,6 +198,10 @@ export default class TripItemEdition extends SmartView {
     this._setDatepicker();
 
     this.setFormSubmitHadler(this._callback.formSubmit);
+
+    if (this._isNew) {
+      return;
+    }
     this.setRollupBtnClickHandler(this._callback.rollupBtnClick);
   }
 
@@ -213,10 +213,11 @@ export default class TripItemEdition extends SmartView {
     }
 
     if (!evt.target.value) {
-      newValue = {
-        destination: undefined,
-        isDestination: false,
-      };
+      this._submitBtn.disabled = true;
+      this._destinationInput.setCustomValidity('Choose the correct destination from the list');
+      this._destinationInput.reportValidity();
+      return;
+
     } else {
       const destination = this._destinations.find((item) => item.name === evt.target.value);
       if (!destination) {
@@ -235,7 +236,7 @@ export default class TripItemEdition extends SmartView {
   }
 
   _onDateChange([date], dateStr, datepicker) {
-    this.updateState({ [datepicker.config.dateType]: date });
+    this.updateState({ [datepicker.config.dateType]: date }, false);
   }
 
   _setDatepicker() {
@@ -305,7 +306,7 @@ export default class TripItemEdition extends SmartView {
 
   _onPriceInputChange(evt) {
     evt.target.value = evt.target.value.replace(/[^\d]/g, '');
-    this.updateState({ basePrice: evt.target.value }, false);
+    this.updateState({ basePrice: parseInt(evt.target.value, 10) }, false);
   }
 
   _formSubmitHandler(evt) {

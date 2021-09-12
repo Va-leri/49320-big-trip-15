@@ -1,6 +1,6 @@
 import TripItemView from '../view/trip-item.js';
 import TripItemEditionView from '../view/trip-item-edition.js';
-import { destinations, offersByType } from '../mock/trip-item-mock.js';
+import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 import { areDatesEqual } from '../utils/trip-item.js';
