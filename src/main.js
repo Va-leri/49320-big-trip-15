@@ -1,11 +1,9 @@
-// import { tripItems } from './mock/trip-item-mock.js';
 import TripMainPresenter from './presenter/trip-main.js';
 import TripEventsPresenter from './presenter/trip-events.js';
 import TripItemsModel from './model/trip-items.js';
 import FilterModel from './model/filter.js';
 import { FilterType, UpdateType } from './const.js';
 import Api from './api.js';
-// import { destinations } from './mock/trip-item-mock.js';
 
 const ENDPOINT = 'https://15.ecmascript.pages.academy/big-trip';
 const AUTHORIZATION = 'Basic r32esdseqslft8rff';

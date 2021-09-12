@@ -18,7 +18,7 @@ export default class PointNew {
     this._changeMode = changeMode;
     this._destroyCallback = null;
 
-    this._formSubmitHadler = this._formSubmitHadler.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
     this._handleDeleteBtnClick = this._handleDeleteBtnClick.bind(this);
   }
@@ -30,13 +30,12 @@ export default class PointNew {
     }
   }
 
-  _formSubmitHadler(newItem) {
+  _handleFormSubmit(newItem) {
     this._handleTripItemChange(
       UserAction.ADD_TRIP_POINT,
       UpdateType.MAJOR,
       newItem,
     );
-    this.destroy();
   }
 
   _handleDeleteBtnClick() {
@@ -57,6 +56,25 @@ export default class PointNew {
     }
   }
 
+  setSaving() {
+    this._tripItemEditionComponent.updateState({
+      isSaving: true,
+      isDisabled: true,
+    });
+  }
+
+  setAborting() {
+
+    const resetFormState = () => {
+      this._tripItemEditionComponent.updateState({
+        isSaving: false,
+        isDisabled: false,
+      });
+    };
+
+    this._tripItemEditionComponent.shake(resetFormState);
+  }
+
   init(callback) {
     this._destroyCallback = callback;
 
@@ -67,7 +85,7 @@ export default class PointNew {
     this._tripItemEditionComponent = new TripItemEditionView(undefined, offersByType, destinations, TYPES, true);
 
     this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
-    this._tripItemEditionComponent.setFormSubmitHadler(this._formSubmitHadler);
+    this._tripItemEditionComponent.setFormSubmitHadler(this._handleFormSubmit);
 
     render(this._itemsList, this._tripItemEditionComponent, RenderPosition.AFTERBEGIN);
 

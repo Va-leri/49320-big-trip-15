@@ -10,6 +10,12 @@ const Mode = {
   EDITING: 'EDITING',
 };
 
+export const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTING: 'ABORTING',
+};
+
 
 export default class Point {
   constructor(itemsList, changeHandler, changeMode) {
@@ -22,7 +28,7 @@ export default class Point {
 
     this._tripItemFormRollupBtnClickHandler = this._tripItemFormRollupBtnClickHandler.bind(this);
     this._tripItemRollupBtnClickHandler = this._tripItemRollupBtnClickHandler.bind(this);
-    this._formSubmitHadler = this._formSubmitHadler.bind(this);
+    this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
     this._handleDeleteBtnClick = this._handleDeleteBtnClick.bind(this);
@@ -64,7 +70,7 @@ export default class Point {
     this._replaceFormToItem();
   }
 
-  _formSubmitHadler(updatedItem) {
+  _handleFormSubmit(updatedItem) {
     const updateType = areDatesEqual(updatedItem, this._item) ? UpdateType.PATCH : UpdateType.MINOR;
 
     this._handleTripItemChange(
@@ -72,7 +78,6 @@ export default class Point {
       updateType,
       updatedItem,
     );
-    this._replaceFormToItem();
   }
 
   _handleFavoriteClick() {
@@ -97,6 +102,39 @@ export default class Point {
     remove(this._tripItemEditionComponent);
   }
 
+  setViewState(state) {
+    if (this._mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this._tripItemEditionComponent.updateState({
+        isSaving: false,
+        isDeleting: false,
+        isDisabled: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this._tripItemEditionComponent.updateState({
+          isSaving: true,
+          isDisabled: true,
+        });
+        break;
+      case State.DELETING:
+        this._tripItemEditionComponent.updateState({
+          isDeleting: true,
+          isDisabled: true,
+        });
+        break;
+      case State.ABORTING:
+        this._tripItemEditionComponent.shake(resetFormState);
+        this._tripItemComponent.shake(resetFormState);
+        break;
+    }
+  }
+
   init(item) {
     this._item = item;
 
@@ -110,7 +148,7 @@ export default class Point {
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);
 
     this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
-    this._tripItemEditionComponent.setFormSubmitHadler(this._formSubmitHadler);
+    this._tripItemEditionComponent.setFormSubmitHadler(this._handleFormSubmit);
 
     this._tripItemEditionComponent.setRollupBtnClickHandler(this._tripItemFormRollupBtnClickHandler);
 
@@ -125,7 +163,8 @@ export default class Point {
     }
 
     if (this._mode === Mode.EDITING) {
-      replace(this._tripItemEditionComponent, prevItemEditionComponent);
+      replace(this._tripItemComponent, prevItemEditionComponent);
+      this._mode = Mode.DEFAULT;
     }
   }
 }
