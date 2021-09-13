@@ -45,9 +45,4 @@ export default class Filters {
   disableFilters() {
     this._filtersComponent.disableFilters();
   }
-
-  /* enableFilters() {
-    this._filtersComponent.enableFilters();
-   }
-   */
 }
