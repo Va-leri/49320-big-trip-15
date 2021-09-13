@@ -247,6 +247,11 @@ export default class TripItemEdition extends SmartView {
 
   _onDateChange([date], dateStr, datepicker) {
     this.updateState({ [datepicker.config.dateType]: date }, false);
+    if (datepicker === this._datepickerStart) {
+      this._datepickerEnd.set('minDate', date);
+    } else if (datepicker === this._datepickerEnd) {
+      this._datepickerStart.set('maxDate', date);
+    }
   }
 
   _setDatepicker() {
