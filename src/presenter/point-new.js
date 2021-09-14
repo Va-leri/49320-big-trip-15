@@ -2,6 +2,8 @@ import TripItemEditionView from '../view/trip-item-edition.js';
 import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../utils/render.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -31,6 +33,11 @@ export default class PointNew {
   }
 
   _handleFormSubmit(newItem) {
+    if (!isOnline()) {
+      toast('You can\'t create new trip point offline');
+      return;
+    }
+
     this._handleTripItemChange(
       UserAction.ADD_TRIP_POINT,
       UpdateType.MAJOR,

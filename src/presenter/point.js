@@ -4,6 +4,8 @@ import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 import { areDatesEqual } from '../utils/trip-item.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -71,6 +73,11 @@ export default class Point {
   }
 
   _handleFormSubmit(updatedItem) {
+    if (!isOnline()) {
+      toast('You can\'t save trip point offline');
+      return;
+    }
+
     const updateType = areDatesEqual(updatedItem, this._item) ? UpdateType.PATCH : UpdateType.MINOR;
 
     this._handleTripItemChange(
@@ -90,6 +97,11 @@ export default class Point {
   }
 
   _handleDeleteBtnClick(deletedItem) {
+    if (!isOnline()) {
+      toast('You can\'t delete trip point offline');
+      return;
+    }
+
     this._handleTripItemChange(
       UserAction.DELETE_TRIP_POINT,
       UpdateType.MINOR,

@@ -26,3 +26,5 @@ export const updateItem = (itemsArr, newItem) => {
 };
 
 export const getArrayOfUnique = (itemsArr) => [...new Set(itemsArr)];
+
+export const isOnline = () => window.navigator.onLine;

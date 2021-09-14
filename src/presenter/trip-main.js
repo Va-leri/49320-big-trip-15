@@ -7,6 +7,8 @@ import ViewMenuView from '../view/view-menu.js';
 import FiltersView from '../view/filters.js';
 import FiltersPresenter from './filters.js';
 import StatisticsView from '../view/statistics.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 
 export default class TripMain {
@@ -115,6 +117,12 @@ export default class TripMain {
 
         // Показать доску
         this._tripEventsPresenter.init();
+
+        if (!isOnline()) {
+          toast('You can\'t create new trip point offline');
+          this._viewMenu.setActiveView(MenuItem.TABLE);
+          break;
+        }
 
         // Показать форму добавления точки
         this._tripEventsPresenter.createTripItem(this._handleAddNewPointClose);
