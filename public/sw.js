@@ -29,9 +29,9 @@ self.addEventListener('install', (evt) => {
         '/img/icons/taxi.png',
         '/img/icons/train.png',
         '/img/icons/transport.png',
-        'img/header-bg.png',
-        'img/header-bg@2x.png',
-        'img/logo.png',
+        '/img/header-bg.png',
+        '/img/header-bg@2x.png',
+        '/img/logo.png',
       ])),
   );
 });

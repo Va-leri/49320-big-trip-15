@@ -7,6 +7,12 @@ const Postfix = {
   POINTS: 'points',
 };
 
+const ItemsType = {
+  DESTINATIONS: 'DESTINATIONS',
+  OFFERS: 'OFFERS',
+  POINTS: 'POINTS',
+};
+
 const dataToKeyName = {
   DESTINATIONS: 'name',
   OFFERS: 'type',
@@ -35,54 +41,36 @@ export default class Provider {
     return this._isSyncNeeded;
   }
 
-  getDestinations() {
-    const postfix = Postfix.DESTINATIONS;
-
-    if (isOnline()) {
-      return this._api.getDestinations()
-        .then((destinations) => {
-          const items = createStoreStructure(destinations, dataToKeyName.DESTINATIONS);
-          this._store.setItems(items, postfix);
-          return destinations;
-        });
-    }
-
-    const storeDestinations = Object.values(this._store.getItems(postfix));
-
-    return Promise.resolve(storeDestinations);
-  }
-
-  getOffers() {
-    const postfix = Postfix.OFFERS;
-
-    if (isOnline()) {
-      return this._api.getOffers()
-        .then((offers) => {
-          const items = createStoreStructure(offers, dataToKeyName.OFFERS);
-          this._store.setItems(items, postfix);
-          return offers;
-        });
-    }
-
-    const storeOffers = Object.values(this._store.getItems(postfix));
-
-    return Promise.resolve(storeOffers);
-  }
-
-  getPoints() {
-    const postfix = Postfix.POINTS;
+  _getItems(itemsType) {
+    const postfix = Postfix[itemsType];
 
     if (isOnline()) {
       return this._api.getPoints()
-        .then((points) => {
-          const items = createStoreStructure(points.map(TripItemsModel.adaptToServer), dataToKeyName.POINTS);
-          this._store.setItems(items, postfix);
-          return points;
+        .then((items) => {
+          if (itemsType === ItemsType.POINTS) {
+            items = items.map(TripItemsModel.adaptToServer);
+          }
+
+          const formattedItems = createStoreStructure(items, dataToKeyName[itemsType]);
+          this._store.setItems(formattedItems, postfix);
+          return items;
         });
     }
     const storePoints = Object.values(this._store.getItems(postfix));
 
     return Promise.resolve(storePoints.map(TripItemsModel.adaptToClient));
+  }
+
+  getDestinations() {
+    return this._getItems(ItemsType.DESTINATIONS);
+  }
+
+  getOffers() {
+    return this._getItems(ItemsType.OFFERS);
+  }
+
+  getPoints() {
+    return this._getItems(ItemsType.POINTS);
   }
 
   updatePoint(point) {
