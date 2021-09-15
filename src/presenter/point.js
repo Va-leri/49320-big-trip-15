@@ -4,6 +4,8 @@ import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, replace, remove } from '../utils/render.js';
 import { areDatesEqual } from '../utils/trip-item.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -26,8 +28,8 @@ export default class Point {
     this._handleTripItemChange = changeHandler;
     this._changeMode = changeMode;
 
-    this._tripItemFormRollupBtnClickHandler = this._tripItemFormRollupBtnClickHandler.bind(this);
-    this._tripItemRollupBtnClickHandler = this._tripItemRollupBtnClickHandler.bind(this);
+    this._handleFormRollupBtnClick = this._handleFormRollupBtnClick.bind(this);
+    this._handleTripItemRollupBtnClick = this._handleTripItemRollupBtnClick.bind(this);
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._escKeydownHandler = this._escKeydownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
@@ -61,16 +63,21 @@ export default class Point {
     }
   }
 
-  _tripItemRollupBtnClickHandler() {
+  _handleTripItemRollupBtnClick() {
     this._replaceItemToForm();
   }
 
-  _tripItemFormRollupBtnClickHandler() {
+  _handleFormRollupBtnClick() {
     this._tripItemEditionComponent.resetState(this._item);
     this._replaceFormToItem();
   }
 
   _handleFormSubmit(updatedItem) {
+    if (!isOnline()) {
+      toast('You can\'t save trip point offline');
+      return;
+    }
+
     const updateType = areDatesEqual(updatedItem, this._item) ? UpdateType.PATCH : UpdateType.MINOR;
 
     this._handleTripItemChange(
@@ -82,6 +89,7 @@ export default class Point {
 
   _handleFavoriteClick() {
     const newItem = Object.assign({}, this._item, { 'isFavorite': !this._item.isFavorite });
+
     this._handleTripItemChange(
       UserAction.UPDATE_TRIP_POINT,
       UpdateType.PATCH,
@@ -90,6 +98,11 @@ export default class Point {
   }
 
   _handleDeleteBtnClick(deletedItem) {
+    if (!isOnline()) {
+      toast('You can\'t delete trip point offline');
+      return;
+    }
+
     this._handleTripItemChange(
       UserAction.DELETE_TRIP_POINT,
       UpdateType.MINOR,
@@ -144,13 +157,11 @@ export default class Point {
     this._tripItemComponent = new TripItemView(this._item);
     this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, destinations, TYPES);
 
-    this._tripItemComponent.setRollupBtnClickHandler(this._tripItemRollupBtnClickHandler);
+    this._tripItemComponent.setRollupBtnClickHandler(this._handleTripItemRollupBtnClick);
     this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);
-
     this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
     this._tripItemEditionComponent.setFormSubmitHadler(this._handleFormSubmit);
-
-    this._tripItemEditionComponent.setRollupBtnClickHandler(this._tripItemFormRollupBtnClickHandler);
+    this._tripItemEditionComponent.setRollupBtnClickHandler(this._handleFormRollupBtnClick);
 
     if (!prevItemComponent || !prevItemEditionComponent) {
       render(this._itemsList, this._tripItemComponent, RenderPosition.BEFOREEND);

@@ -1,4 +1,4 @@
-import TripItemsModel from './model/trip-items';
+import TripItemsModel from '../model/trip-items';
 
 const Method = {
   GET: 'GET',
@@ -59,6 +59,16 @@ export default class Api {
       method: Method.DELETE,
       headers: new Headers({ 'Content-Type': 'application/json' }),
     });
+  }
+
+  sync(data) {
+    return this._load({
+      url: 'points/sync',
+      method: Method.POST,
+      headers: new Headers({ 'Content-type': 'application/json' }),
+      body: JSON.stringify(data),
+    })
+      .then(Api.toJSON);
   }
 
   _load({

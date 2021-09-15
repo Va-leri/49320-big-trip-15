@@ -1,13 +1,13 @@
 import { humanizeDate } from '../utils/common.js';
 import AbstractView from './abstract';
 
-const createTripRouteTemplate = (tripPointsArr) =>
-  tripPointsArr.length > 3 ?
-    `${tripPointsArr[0].destination ? tripPointsArr[0].destination.name : '...'} &mdash;...&mdash; ${tripPointsArr[tripPointsArr.length - 1].destination ? tripPointsArr[tripPointsArr.length - 1].destination.name : '...'}` :
-    `${tripPointsArr.map(({ destination }) => destination ? destination.name : '...').join(' &mdash; ')}`;
+const createTripRouteTemplate = (tripPoints) =>
+  tripPoints.length > 3 ?
+    `${tripPoints[0].destination ? tripPoints[0].destination.name : '...'} &mdash;...&mdash; ${tripPoints[tripPoints.length - 1].destination ? tripPoints[tripPoints.length - 1].destination.name : '...'}` :
+    `${tripPoints.map(({ destination }) => destination ? destination.name : '...').join(' &mdash; ')}`;
 
-const createTripDatesTemplate = (tripPointsArr) =>
-  `${humanizeDate(tripPointsArr[0].dateFrom, 'MMM DD')} &mdash; ${humanizeDate(tripPointsArr[tripPointsArr.length - 1].dateTo, 'MMM DD')}`;
+const createTripDatesTemplate = (tripPoints) =>
+  `${humanizeDate(tripPoints[0].dateFrom, 'MMM DD')} &mdash; ${humanizeDate(tripPoints[tripPoints.length - 1].dateTo, 'MMM DD')}`;
 
 const createTripInfoTemplate = (tripPoints) => {
   const tripRouteTemplate = createTripRouteTemplate(tripPoints);

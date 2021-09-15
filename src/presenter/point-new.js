@@ -2,18 +2,13 @@ import TripItemEditionView from '../view/trip-item-edition.js';
 import { destinations, offersByType } from '../main.js';
 import { TYPES, KeyCode, RenderPosition, UpdateType, UserAction } from '../const.js';
 import { render, remove } from '../utils/render.js';
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
-
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 export default class PointNew {
   constructor(itemsList, changeHandler, changeMode) {
     this._itemsList = itemsList;
     this._tripItemEditionComponent = null;
-    this._mode = Mode.DEFAULT;
     this._handleTripItemChange = changeHandler;
     this._changeMode = changeMode;
     this._destroyCallback = null;
@@ -31,6 +26,11 @@ export default class PointNew {
   }
 
   _handleFormSubmit(newItem) {
+    if (!isOnline()) {
+      toast('You can\'t create new trip point offline');
+      return;
+    }
+
     this._handleTripItemChange(
       UserAction.ADD_TRIP_POINT,
       UpdateType.MAJOR,

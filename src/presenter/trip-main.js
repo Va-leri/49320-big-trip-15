@@ -7,6 +7,8 @@ import ViewMenuView from '../view/view-menu.js';
 import FiltersView from '../view/filters.js';
 import FiltersPresenter from './filters.js';
 import StatisticsView from '../view/statistics.js';
+import { isOnline } from '../utils/common.js';
+import { toast } from '../utils/toast.js';
 
 
 export default class TripMain {
@@ -72,6 +74,7 @@ export default class TripMain {
 
   _renderFilter() {
     const filtersPresenter = new FiltersPresenter(this._tripControlsFiltersElement, this._filterModel, this._tripItemsModel);
+
     this._filtersPresenter = filtersPresenter;
     this._filtersPresenter.init();
   }
@@ -96,6 +99,7 @@ export default class TripMain {
 
   _handleAddNewPointClose() {
     this._addNewPointBtn.disabled = false;
+
     // После сохранения переключиться на режим TABLE
     this._viewMenu.setActiveView(MenuItem.TABLE);
   }
@@ -107,6 +111,7 @@ export default class TripMain {
   _handleSiteMenuClick(menuItem) {
     switch (menuItem) {
       case MenuItem.ADD_NEW_POINT:
+
         // Скрыть статистику
         remove(this._statisticsComponent);
 
@@ -116,6 +121,12 @@ export default class TripMain {
         // Показать доску
         this._tripEventsPresenter.init();
 
+        if (!isOnline()) {
+          toast('You can\'t create new trip point offline');
+          this._viewMenu.setActiveView(MenuItem.TABLE);
+          break;
+        }
+
         // Показать форму добавления точки
         this._tripEventsPresenter.createTripItem(this._handleAddNewPointClose);
         this._viewMenu.setActiveView(MenuItem.ADD_NEW_POINT);
@@ -124,6 +135,7 @@ export default class TripMain {
         this._addNewPointBtn.disabled = true;
         break;
       case MenuItem.TABLE:
+
         // Скрыть статистику
         remove(this._statisticsComponent);
 
@@ -141,6 +153,7 @@ export default class TripMain {
 
         break;
       case MenuItem.STATISTICS:
+
         // Скрыть доску
         this._tripEventsPresenter.destroy();
 

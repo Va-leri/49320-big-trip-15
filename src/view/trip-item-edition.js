@@ -11,7 +11,7 @@ const createTripTypesTemplate = (tripTypes) => tripTypes.map((type) => `<div cla
     <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${capitalizeFirstLetter(type)}</label>
   </div>`).join('');
 
-const createDestinationsListTemplate = (destinationsArr) => destinationsArr.map((destination) => `<option value="${destination.name}"></option>`).join('');
+const createDestinationsListTemplate = (destinations) => destinations.map((destination) => `<option value="${destination.name}"></option>`).join('');
 
 const createOffersTemplate = (areAvailableOffers, offersByType, tripType, activeOffers, isDisabled) => {
   if (!areAvailableOffers) {
@@ -143,11 +143,11 @@ export default class TripItemEdition extends SmartView {
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._rollupBtnClickHandler = this._rollupBtnClickHandler.bind(this);
-    this._onDestinationChange = this._onDestinationChange.bind(this);
-    this._onTripTypeClick = this._onTripTypeClick.bind(this);
-    this._onOfferCheckboxChange = this._onOfferCheckboxChange.bind(this);
-    this._onPriceInputChange = this._onPriceInputChange.bind(this);
-    this._onDateChange = this._onDateChange.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._tripTypeClickHandler = this._tripTypeClickHandler.bind(this);
+    this._offerCheckboxChangeHandler = this._offerCheckboxChangeHandler.bind(this);
+    this._priceInputChangeHandler = this._priceInputChangeHandler.bind(this);
+    this._dateChangeHandler = this._dateChangeHandler.bind(this);
     this._deleteBtnClickHandler = this._deleteBtnClickHandler.bind(this);
 
     this._setInnerHandlers();
@@ -159,46 +159,13 @@ export default class TripItemEdition extends SmartView {
     this.updateState(TripItemEdition.parseDataToState(data, this._offersByType));
   }
 
-  static parseDataToState(data, offersByType) {
-    return Object.assign({}, data, {
-      basePrice: data.basePrice ? data.basePrice : '',
-      isDestination: data.destination !== undefined,
-      areAvailableOffers: Boolean(offersByType.find((item) => item.type === data.type).offers.length),
-      isDisabled: false,
-      isSaving: false,
-      isDeleting: false,
-    });
-  }
-
-  static parseStateToData(state) {
-    const newData = Object.assign({}, state);
-    if (!state.isDestination) {
-      newData.destination = undefined;
-    }
-
-    if (!state.areAvailableOffers) {
-      newData.offers = [];
-    }
-
-    if (!state.basePrice) {
-      newData.basePrice = 0;
-    }
-
-    delete newData.isDestination;
-    delete newData.areAvailableOffers;
-    delete newData.isDisabled;
-    delete newData.isSaving;
-    delete newData.isDeleting;
-    return newData;
-  }
-
   _setInnerHandlers() {
     this._destinationInput = this.getElement().querySelector('.event__input--destination');
-    this._destinationInput.addEventListener('change', this._onDestinationChange);
+    this._destinationInput.addEventListener('change', this._destinationChangeHandler);
 
-    this.getElement().querySelector('.event__type-list').addEventListener('click', this._onTripTypeClick);
-    this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._onOfferCheckboxChange));
-    this.getElement().querySelector('.event__input--price').addEventListener('input', this._onPriceInputChange);
+    this.getElement().querySelector('.event__type-list').addEventListener('click', this._tripTypeClickHandler);
+    this.getElement().querySelectorAll('.event__offer-checkbox').forEach((input) => input.addEventListener('change', this._offerCheckboxChangeHandler));
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._priceInputChangeHandler);
     this._submitBtn = this.getElement().querySelector('.event__save-btn');
   }
 
@@ -215,8 +182,7 @@ export default class TripItemEdition extends SmartView {
     this.setRollupBtnClickHandler(this._callback.rollupBtnClick);
   }
 
-  _onDestinationChange(evt) {
-    let newValue;
+  _destinationChangeHandler(evt) {
     if (this._submitBtn.disabled) {
       this._submitBtn.disabled = false;
       this._destinationInput.setCustomValidity('');
@@ -227,25 +193,25 @@ export default class TripItemEdition extends SmartView {
       this._destinationInput.setCustomValidity('Choose the correct destination from the list');
       this._destinationInput.reportValidity();
       return;
-
-    } else {
-      const destination = this._destinations.find((item) => item.name === evt.target.value);
-      if (!destination) {
-        this._submitBtn.disabled = true;
-        this._destinationInput.setCustomValidity('Choose the correct destination from the list');
-        this._destinationInput.reportValidity();
-        return;
-      }
-      newValue = {
-        destination,
-        isDestination: true,
-      };
     }
+    const destination = this._destinations.find((item) => item.name === evt.target.value);
+
+    if (!destination) {
+      this._submitBtn.disabled = true;
+      this._destinationInput.setCustomValidity('Choose the correct destination from the list');
+      this._destinationInput.reportValidity();
+      return;
+    }
+
+    const newValue = {
+      destination,
+      isDestination: true,
+    };
 
     this.updateState(newValue);
   }
 
-  _onDateChange([date], dateStr, datepicker) {
+  _dateChangeHandler([date], dateStr, datepicker) {
     this.updateState({ [datepicker.config.dateType]: date }, false);
     if (datepicker === this._datepickerStart) {
       this._datepickerEnd.set('minDate', date);
@@ -272,7 +238,7 @@ export default class TripItemEdition extends SmartView {
       enableTime: true,
       'time_24hr': true,
       maxDate: this._state.dateTo,
-      onChange: this._onDateChange,
+      onChange: this._dateChangeHandler,
       dateType: 'dateFrom',
     });
 
@@ -282,13 +248,13 @@ export default class TripItemEdition extends SmartView {
       enableTime: true,
       'time_24hr': true,
       minDate: this._state.dateFrom,
-      onChange: this._onDateChange,
+      onChange: this._dateChangeHandler,
       dateType: 'dateTo',
     });
 
   }
 
-  _onTripTypeClick(evt) {
+  _tripTypeClickHandler(evt) {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
@@ -304,7 +270,7 @@ export default class TripItemEdition extends SmartView {
     this.updateState(newValue);
   }
 
-  _onOfferCheckboxChange(evt) {
+  _offerCheckboxChangeHandler(evt) {
     const input = evt.target;
     const offerTitle = input.parentNode.querySelector('.event__offer-title').innerText;
     let activeOffers;
@@ -319,7 +285,7 @@ export default class TripItemEdition extends SmartView {
     this.updateState({ offers: activeOffers }, false);
   }
 
-  _onPriceInputChange(evt) {
+  _priceInputChangeHandler(evt) {
     this.updateState({ basePrice: parseInt(evt.target.value, 10) }, false);
   }
 
@@ -366,5 +332,39 @@ export default class TripItemEdition extends SmartView {
       this._datepickerStart = null;
       this._datepickerEnd = null;
     }
+  }
+
+  static parseDataToState(data, offersByType) {
+    return Object.assign({}, data, {
+      basePrice: data.basePrice ? data.basePrice : '',
+      isDestination: data.destination !== undefined,
+      areAvailableOffers: Boolean(offersByType.find((item) => item.type === data.type).offers.length),
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    });
+  }
+
+  static parseStateToData(state) {
+    const newData = Object.assign({}, state);
+
+    if (!state.isDestination) {
+      newData.destination = undefined;
+    }
+
+    if (!state.areAvailableOffers) {
+      newData.offers = [];
+    }
+
+    if (!state.basePrice) {
+      newData.basePrice = 0;
+    }
+
+    delete newData.isDestination;
+    delete newData.areAvailableOffers;
+    delete newData.isDisabled;
+    delete newData.isSaving;
+    delete newData.isDeleting;
+    return newData;
   }
 }

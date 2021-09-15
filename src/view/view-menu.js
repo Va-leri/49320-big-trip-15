@@ -17,8 +17,6 @@ export default class ViewMenu extends AbstractView {
     this._menuClickHandler = this._menuClickHandler.bind(this);
     this._activeViewMode = defaultViewMode;
     this._activeViewItem = this.getElement().querySelector(`[data-value="${this._activeViewMode}"`);
-
-    this._menuClickHandler = this._menuClickHandler.bind(this);
   }
 
   getTemplate() {
