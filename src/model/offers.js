@@ -6,8 +6,8 @@ export default class Offers extends AbstractObservable {
     this._offers = [];
   }
 
-  set offers(offersArr) {
-    this._offers = offersArr.slice();
+  set offers(items) {
+    this._offers = items.slice();
   }
 
   get offers() {

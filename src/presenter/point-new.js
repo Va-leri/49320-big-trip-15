@@ -5,17 +5,10 @@ import { render, remove } from '../utils/render.js';
 import { isOnline } from '../utils/common.js';
 import { toast } from '../utils/toast.js';
 
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  EDITING: 'EDITING',
-};
-
-
 export default class PointNew {
   constructor(itemsList, changeHandler, changeMode) {
     this._itemsList = itemsList;
     this._tripItemEditionComponent = null;
-    this._mode = Mode.DEFAULT;
     this._handleTripItemChange = changeHandler;
     this._changeMode = changeMode;
     this._destroyCallback = null;

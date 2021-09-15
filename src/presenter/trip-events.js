@@ -94,6 +94,7 @@ export default class TripEvents {
 
   _renderTripItem(item) {
     const pointPresenter = new PointPresenter(this._tripItemsList, this._handleViewAction, this._handleModeChange);
+
     pointPresenter.init(item);
     this._pointPresenter.set(item.id, pointPresenter);
   }

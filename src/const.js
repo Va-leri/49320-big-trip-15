@@ -2,16 +2,6 @@ export const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-
 
 export const TRIP_ITEMS_COUNT = 15;
 
-export const BLANC_POINT = {
-  type: TYPES[0],
-  dateFrom: new Date(),
-  dateTo: new Date,
-  basePrice: '',
-  offers: [],
-  destination: undefined,
-  isFavorite: false,
-};
-
 export const KeyCode = {
   ESC: 27,
   ENTER: 13,
@@ -67,4 +57,14 @@ export const MenuItem = {
   ADD_NEW_POINT: 'ADD_NEW_POINT',
   TABLE: 'TABLE',
   STATISTICS: 'STATISTICS',
+};
+
+export const BLANC_POINT = {
+  type: TYPES[0],
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  basePrice: '',
+  offers: [],
+  destination: undefined,
+  isFavorite: false,
 };

@@ -1,12 +1,14 @@
 import SmartView from './smart';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { getArrayOfUnique } from '../utils/common';
+import { getUniqueItems } from '../utils/common';
 import { getItemsByType, sortValues } from '../utils/statistics';
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { formatDate } from '../utils/trip';
 dayjs.extend(duration);
+
+const BAR_HEIGHT = 55;
 
 const renderMoneyChart = (ctx, items, types) => {
   const money = types.map((type) => getItemsByType(type, items).reduce((price, item) => price + item.basePrice, 0));
@@ -259,10 +261,8 @@ export default class Statistics extends SmartView {
   }
 
   _setCharts() {
-    const BAR_HEIGHT = 55;
-
     const itemTypes = this._items.map(({ type }) => type);
-    this._uniqueTypes = getArrayOfUnique(itemTypes);
+    this._uniqueTypes = getUniqueItems(itemTypes);
 
     const context = new Map();
     context.set('money', this.getElement().querySelector('#money'));

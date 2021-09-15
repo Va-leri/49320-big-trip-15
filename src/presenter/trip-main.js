@@ -74,6 +74,7 @@ export default class TripMain {
 
   _renderFilter() {
     const filtersPresenter = new FiltersPresenter(this._tripControlsFiltersElement, this._filterModel, this._tripItemsModel);
+
     this._filtersPresenter = filtersPresenter;
     this._filtersPresenter.init();
   }
@@ -98,6 +99,7 @@ export default class TripMain {
 
   _handleAddNewPointClose() {
     this._addNewPointBtn.disabled = false;
+
     // После сохранения переключиться на режим TABLE
     this._viewMenu.setActiveView(MenuItem.TABLE);
   }
@@ -109,6 +111,7 @@ export default class TripMain {
   _handleSiteMenuClick(menuItem) {
     switch (menuItem) {
       case MenuItem.ADD_NEW_POINT:
+
         // Скрыть статистику
         remove(this._statisticsComponent);
 
@@ -132,6 +135,7 @@ export default class TripMain {
         this._addNewPointBtn.disabled = true;
         break;
       case MenuItem.TABLE:
+
         // Скрыть статистику
         remove(this._statisticsComponent);
 
@@ -149,6 +153,7 @@ export default class TripMain {
 
         break;
       case MenuItem.STATISTICS:
+
         // Скрыть доску
         this._tripEventsPresenter.destroy();
 

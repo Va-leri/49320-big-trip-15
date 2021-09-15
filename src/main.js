@@ -50,10 +50,9 @@ apiWithProvider.getPoints().then((points) => {
     tripItemsModel.setItems(UpdateType.INIT, []);
   });
 
-export { destinations, offersByType };
 
 window.addEventListener('load', () => {
-  navigator.serviceWorker.register('/sw.js');
+  navigator.serviceWorker.register('./sw.js');
 });
 
 window.addEventListener('online', () => {
@@ -66,3 +65,5 @@ window.addEventListener('online', () => {
 window.addEventListener('offline', () => {
   document.title += ' [offline]';
 });
+
+export { destinations, offersByType };

@@ -13,7 +13,6 @@ export default class Store {
   }
 
   setItems(items, storeKeyPostfix) {
-    // debugger;
     this._storage.setItem(
       `${this._storeKey}-${storeKeyPostfix}`,
       JSON.stringify(items),

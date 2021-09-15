@@ -13,7 +13,7 @@ const dataToKeyName = {
   POINTS: 'id',
 };
 
-const createStoreStructure = (arr, keyName) => arr.reduce((obj, current) => Object.assign({}, obj, { [current[keyName]]: current }), {});
+const createStoreStructure = (items, keyName) => items.reduce((obj, current) => Object.assign({}, obj, { [current[keyName]]: current }), {});
 
 const getSyncedPoints = (items) =>
   items

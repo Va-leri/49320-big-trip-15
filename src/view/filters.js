@@ -21,14 +21,14 @@ export default class Filters extends AbstractView {
     this._filters = filters;
     this._activeFilterType = activeFilterType;
 
-    this._onFilterTypeChange = this._onFilterTypeChange.bind(this);
+    this._filterTypeChangeHandler = this._filterTypeChangeHandler.bind(this);
   }
 
   getTemplate() {
     return createFiltersTemplate(this._filters, this._activeFilterType);
   }
 
-  _onFilterTypeChange(evt) {
+  _filterTypeChangeHandler(evt) {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
@@ -38,7 +38,7 @@ export default class Filters extends AbstractView {
 
   setChangeFilterTypeHandler(callback) {
     this._callback.changeType = callback;
-    this.getElement().addEventListener('click', this._onFilterTypeChange);
+    this.getElement().addEventListener('click', this._filterTypeChangeHandler);
   }
 
   disableFilters() {

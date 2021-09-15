@@ -27,7 +27,6 @@ export default class Filters {
     this._filterModel.setActiveFilter(UpdateType.MAJOR, filterType);
   }
 
-
   _getFilters() {
     const tripItems = this._tripItemsModel.tripItems;
 

@@ -11,20 +11,20 @@ export const getRandomInteger = (a = 0, b = 1) => {
 
 export const humanizeDate = (date, formatString) => dayjs(date).format(formatString);
 
-export const updateItem = (itemsArr, newItem) => {
-  const index = itemsArr.findIndex((item) => item.id === newItem.id);
+export const updateItem = (items, newItem) => {
+  const index = items.findIndex((item) => item.id === newItem.id);
 
   if (index === -1) {
-    return itemsArr;
+    return items;
   }
 
   return [
-    ...itemsArr.slice(0, index),
+    ...items.slice(0, index),
     newItem,
-    ...itemsArr.slice(index + 1),
+    ...items.slice(index + 1),
   ];
 };
 
-export const getArrayOfUnique = (itemsArr) => [...new Set(itemsArr)];
+export const getUniqueItems = (items) => [...new Set(items)];
 
 export const isOnline = () => window.navigator.onLine;
