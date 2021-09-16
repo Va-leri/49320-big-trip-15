@@ -7,12 +7,6 @@ const Postfix = {
   POINTS: 'points',
 };
 
-const ItemsType = {
-  DESTINATIONS: 'DESTINATIONS',
-  OFFERS: 'OFFERS',
-  POINTS: 'POINTS',
-};
-
 const dataToKeyName = {
   DESTINATIONS: 'name',
   OFFERS: 'type',
@@ -41,36 +35,54 @@ export default class Provider {
     return this._isSyncNeeded;
   }
 
-  _getItems(itemsType) {
-    const postfix = Postfix[itemsType];
+  getDestinations() {
+    const postfix = Postfix.DESTINATIONS;
 
     if (isOnline()) {
-      return this._api.getPoints()
+      return this._api.getDestinations()
         .then((items) => {
-          if (itemsType === ItemsType.POINTS) {
-            items = items.map(TripItemsModel.adaptToServer);
-          }
 
-          const formattedItems = createStoreStructure(items, dataToKeyName[itemsType]);
+          const formattedItems = createStoreStructure(items, dataToKeyName.DESTINATIONS);
           this._store.setItems(formattedItems, postfix);
           return items;
         });
     }
-    const storePoints = Object.values(this._store.getItems(postfix));
+    const storeItems = Object.values(this._store.getItems(postfix));
 
-    return Promise.resolve(storePoints.map(TripItemsModel.adaptToClient));
-  }
-
-  getDestinations() {
-    return this._getItems(ItemsType.DESTINATIONS);
+    return Promise.resolve(storeItems);
   }
 
   getOffers() {
-    return this._getItems(ItemsType.OFFERS);
+    const postfix = Postfix.OFFERS;
+
+    if (isOnline()) {
+      return this._api.getOffers()
+        .then((items) => {
+
+          const formattedItems = createStoreStructure(items, dataToKeyName.OFFERS);
+          this._store.setItems(formattedItems, postfix);
+          return items;
+        });
+    }
+    const storeItems = Object.values(this._store.getItems(postfix));
+
+    return Promise.resolve(storeItems);
   }
 
   getPoints() {
-    return this._getItems(ItemsType.POINTS);
+    const postfix = Postfix.POINTS;
+
+    if (isOnline()) {
+      return this._api.getPoints()
+        .then((items) => {
+          const formattedItems = createStoreStructure(items.map(TripItemsModel.adaptToServer), dataToKeyName.POINTS);
+          this._store.setItems(formattedItems, postfix);
+          return items;
+        });
+    }
+    const storeItems = Object.values(this._store.getItems(postfix));
+
+    return Promise.resolve(storeItems.map(TripItemsModel.adaptToClient));
   }
 
   updatePoint(point) {
