@@ -78,7 +78,7 @@ export default class TripItem extends AbstractView {
     this._callback.rollupBtnClick = callback;
   }
 
-  setFavoriteClikHandler(callback) {
+  setFavoriteClickHandler(callback) {
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
     this._callback.favoriteBtnClick = callback;
   }

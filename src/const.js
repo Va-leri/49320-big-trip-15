@@ -1,7 +1,5 @@
 export const TYPES = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant'];
 
-export const TRIP_ITEMS_COUNT = 15;
-
 export const KeyCode = {
   ESC: 27,
   ENTER: 13,

@@ -33,11 +33,7 @@ export default class Provider {
     this._isSyncNeeded = false;
   }
 
-  set isSyncNeeded(boolean) {
-    this._isSyncNeeded = boolean;
-  }
-
-  get isSyncNeeded() {
+  getSyncNeed() {
     return this._isSyncNeeded;
   }
 

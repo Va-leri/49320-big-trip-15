@@ -57,7 +57,7 @@ window.addEventListener('load', () => {
 
 window.addEventListener('online', () => {
   document.title = document.title.replace(' [offline]', '');
-  if (apiWithProvider.isSyncNeeded) {
+  if (apiWithProvider.getSyncNeed()) {
     apiWithProvider.sync();
   }
 });

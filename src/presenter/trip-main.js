@@ -52,10 +52,6 @@ export default class TripMain {
     return this._tripItemsModel.tripItems;
   }
 
-  _getActiveFilter() {
-    return this._filterModel.activeFilter;
-  }
-
   _renderTripInfo() {
     if (this._isLoading) {
       return;

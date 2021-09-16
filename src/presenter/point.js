@@ -158,7 +158,7 @@ export default class Point {
     this._tripItemEditionComponent = new TripItemEditionView(this._item, offersByType, destinations, TYPES);
 
     this._tripItemComponent.setRollupBtnClickHandler(this._handleTripItemRollupBtnClick);
-    this._tripItemComponent.setFavoriteClikHandler(this._handleFavoriteClick);
+    this._tripItemComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._tripItemEditionComponent.setDeleteBtnClickHandler(this._handleDeleteBtnClick);
     this._tripItemEditionComponent.setFormSubmitHadler(this._handleFormSubmit);
     this._tripItemEditionComponent.setRollupBtnClickHandler(this._handleFormRollupBtnClick);
